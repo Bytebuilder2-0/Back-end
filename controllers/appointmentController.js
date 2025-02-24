@@ -19,7 +19,7 @@ const createAppointment = async(req, res) => {
 const getAppointments = async(req, res) => {
     try {
         const appointments = await Appointment.find({},
-            "vehicleId vehicleNumber model issue workload tech status"
+            "vehicleId vehicleNumber model issue workload tech status techMessage"
         );
         res.json(appointments);
     } catch (error) {
@@ -56,4 +56,33 @@ const updateWorkload = async(req, res) => {
     }
 };
 
-module.exports = { createAppointment, getAppointments, updateWorkload };
+const suggestionWrite = async(req, res) => {
+    const { suggestion } = req.body;
+    const { appointmentId } = req.params;
+
+    if (!mongoose.isValidObjectId(appointmentId)) {
+        return res.status(400).json({ message: "Invalid appointment ID format" });
+    }
+
+    try {
+        const appointment = await Appointment.findById(appointmentId);
+        if (!appointment) {
+            return res.status(404).json({ message: "Appointment not found" });
+        }
+
+        if (!suggestion || suggestion.trim() === "") {
+            return res.status(400).json({ message: "Suggestion cannot be empty" });
+        }
+
+        appointment.suggestion = suggestion;
+        await appointment.save();
+
+        res.json({ message: "✅ Suggestion updated successfully", appointment });
+    } catch (error) {
+        console.error("🚨 Error:", error.message);
+        res.status(500).json({ error: error.message });
+    }
+};
+
+
+module.exports = { createAppointment, getAppointments, updateWorkload, suggestionWrite };
