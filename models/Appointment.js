@@ -9,9 +9,9 @@ const appointmentSchema = new mongoose.Schema({
             type: String,
             enum: [
                 "Pending",
-                "Confirmed",
+                "Confirmed", "Reject1",
                 "Waiting for Technician Confirmation",
-                "Accepted",
+                "Accepted", "Reject2",
                 "Task Done",
                 "Paid",
                 "Completed"
@@ -24,6 +24,8 @@ const appointmentSchema = new mongoose.Schema({
             ref: "Technician", //model name not the collection name
             default: null,
         },
+        techMessage: { type: String, default: null },
+        suggestion: { type: String, default: null }
     }, { timestamps: true } // Auto-adds createdAt & updatedAt
 );
 
