@@ -25,7 +25,8 @@ const appointmentSchema = new mongoose.Schema({
             default: null,
         },
         techMessage: { type: String, default: null },
-        suggestion: { type: String, default: null }
+        suggestion: { type: String, default: null },
+        contactNumber: { type: String }
     }, { timestamps: true } // Auto-adds createdAt & updatedAt
 );
 
