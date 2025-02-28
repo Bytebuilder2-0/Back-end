@@ -30,7 +30,7 @@ const getAppointments = async (req, res) => {
 
 // 3️⃣ Update workload for an appointment (Supervisor updates workload)
 const updateWorkload = async (req, res) => {
-  const { workload } = req.body;
+  const { workload } = req.body; // Expecting an array of objects
   const { id } = req.params;
 
   if (!mongoose.isValidObjectId(id)) {
@@ -43,17 +43,35 @@ const updateWorkload = async (req, res) => {
       return res.status(404).json({ message: "Appointment not found" });
     }
 
-    if (!workload || workload.trim() === "") {
-      return res.status(400).json({ message: "Workload cannot be empty" });
+    // Validate workload: should be an array with valid items
+    if (!Array.isArray(workload) || workload.length === 0) {
+      return res
+        .status(400)
+        .json({ message: "Workload must be a non-empty array" });
     }
 
+    // Validate structure of workload items
+    for (const task of workload) {
+      if (
+        typeof task.step !== "number" ||
+        typeof task.description !== "string" ||
+        (task.status &&
+          !["Pending", "In Progress", "Completed"].includes(task.status))
+      ) {
+        return res.status(400).json({ message: "Invalid workload format" });
+      }
+    }
+
+    // Update appointment workload
     appointment.workload = workload;
     await appointment.save();
 
-    res.json({ message: "✅ Workload updated successfully", appointment });
+    return res
+      .status(200)
+      .json({ message: "Workload updated successfully", appointment });
   } catch (error) {
-    console.error("🚨 Error:", error.message);
-    res.status(500).json({ error: error.message });
+    console.error("Error updating workload:", error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
