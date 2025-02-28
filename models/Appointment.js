@@ -13,8 +13,7 @@ const appointmentSchema = new mongoose.Schema({
                 "Waiting for Technician Confirmation",
                 "Accepted", "Reject2",
                 "Task Done",
-                "Paid",
-                "Completed"
+                "Paid"
             ],
             default: "Pending"
         },
