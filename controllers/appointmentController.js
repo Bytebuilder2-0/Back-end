@@ -1,14 +1,36 @@
 const Appointment = require("../models/Appointment.js");
 const mongoose = require("mongoose");
+const Budget = require("../models/Budget.js");
 
 // 1️⃣ Create a new appointment (Client submits form)
 const createAppointment = async(req, res) => {
     try {
+        // Step 1: Create a new appointment
         const newAppointment = new Appointment(req.body);
         await newAppointment.save();
-        res
-            .status(201)
-            .json({ message: "✅ Appointment created successfully", newAppointment });
+
+        // Step 2: Create a linked budget (only references appointmentId)
+        const newBudget = new Budget({
+            appointmentId: newAppointment._id, // Link to appointment
+            amountAllocations: newAppointment.workload.map((task) => ({
+                step: task.step,
+                des: task.description,
+                amount: 0, // Default amount, supervisor updates later
+            })),
+            totalAmount: 0, // Starts at 0, gets updated later
+        });
+
+        await newBudget.save();
+
+        // Step 3: (Optional) Link the budget in the appointment model if needed
+        newAppointment.budgetId = newBudget._id;
+        await newAppointment.save();
+
+        res.status(201).json({
+            message: "✅ Appointment and Budget created successfully",
+            appointment: newAppointment,
+            budget: newBudget,
+        });
     } catch (error) {
         console.error("🚨 Error:", error.message);
         res.status(500).json({ error: error.message });
@@ -107,12 +129,12 @@ const getWorkload = (req, res) => {
     Appointment.findById(appointmentId)
         .then((appointment) => {
             if (!appointment) {
-                return res.status(404).json({ message: 'Appointment not found' });
+                return res.status(404).json({ message: "Appointment not found" });
             }
             res.json({ workload: appointment.workload }); // Send the workload data
         })
         .catch((error) => {
-            res.status(500).json({ message: 'Error fetching workload', error });
+            res.status(500).json({ message: "Error fetching workload", error });
         });
 };
 
