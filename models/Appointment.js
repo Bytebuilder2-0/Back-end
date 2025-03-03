@@ -1,10 +1,21 @@
 const mongoose = require("mongoose");
 
 const appointmentSchema = new mongoose.Schema({
-        vehicleId: { type: String, required: true },
+
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User", // Reference to the User model
+        required: true
+    },
+    vehicleId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Vehicle", // Reference to the Vehicle model
+        required: true
+    },
+
         vehicleNumber: { type: String, required: true },
         model: { type: String, required: true },
-        issue: { type: String, required: true },
+        issue: { type: String, required: false  },    
         status: {
             type: String,
             enum: [
@@ -18,6 +29,14 @@ const appointmentSchema = new mongoose.Schema({
             ],
             default: "Pending"
         },
+         services: [{ 
+        type: String, 
+        enum: ["A/C repair", "Oil repair", "Break Services"], 
+        required: true 
+    }],
+        preferredTime: { type: String, required: true },
+        expectedDeliveryDate: { type: Date, required: true },
+        
         workload: { type: String, default: "123" },
         tech: {
             type: mongoose.Schema.Types.ObjectId,

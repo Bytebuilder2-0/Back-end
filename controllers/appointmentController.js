@@ -2,18 +2,18 @@ const Appointment = require("../models/Appointment.js");
 const mongoose = require("mongoose");
 
 // 1️⃣ Create a new appointment (Client submits form)
-const createAppointment = async(req, res) => {
-    try {
-        const newAppointment = new Appointment(req.body);
-        await newAppointment.save();
-        res
-            .status(201)
-            .json({ message: "✅ Appointment created successfully", newAppointment });
-    } catch (error) {
-        console.error("🚨 Error:", error.message);
-        res.status(500).json({ error: error.message });
-    }
-};
+// const createAppointment = async(req, res) => {
+//     try {
+//         const newAppointment = new Appointment(req.body);
+//         await newAppointment.save();
+//         res
+//             .status(201)
+//             .json({ message: "✅ Appointment created successfully", newAppointment });
+//     } catch (error) {
+//         console.error("🚨 Error:", error.message);
+//         res.status(500).json({ error: error.message });
+//     }
+// };
 
 // 2️⃣ Get all appointments (Supervisor dashboard)
 const getAppointments = async(req, res) => {
@@ -85,4 +85,4 @@ const suggestionWrite = async(req, res) => {
 };
 
 
-module.exports = { createAppointment, getAppointments, updateWorkload, suggestionWrite };
+module.exports = {  getAppointments, updateWorkload, suggestionWrite };
