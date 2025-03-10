@@ -16,7 +16,7 @@ const { updateAppointmentStatus } = require("../controllers/statusUpdate.js");
 
 const router = express.Router();
 
-router.post("/", authMiddleware, createAppointment);
+router.post("/:user_id", createAppointment);
 router.get("/services", getServices); 
 router.get("/vehicles/:user_id", getUserVehicles); 
 
