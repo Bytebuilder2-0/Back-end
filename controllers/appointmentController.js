@@ -9,9 +9,9 @@ const createAppointment = async (req, res) => {
   try {
 
 
-    const { vehicleId, services, issue, preferredTime, expectedDeliveryDate, contactNumber } = req.body;
+    const { vehicleId,vehicleObject, services, issue, preferredTime, expectedDeliveryDate, contactNumber } = req.body;
 
-        if (!vehicleId || !services || !preferredTime || !expectedDeliveryDate || !contactNumber) {
+        if (!vehicleId || !vehicleObject || !services || !preferredTime || !expectedDeliveryDate || !contactNumber) {
             return res.status(400).json({ message: "All fields are required" });
         }
          const userId = req.params.user_id
@@ -19,19 +19,20 @@ const createAppointment = async (req, res) => {
     
         const userVehicles = await Vehicle.find({ user: userId });
 
-        const selectedVehicle = userVehicles.find(vehicle => vehicle._id.toString() === vehicleId);
+        const selectedVehicle = userVehicles.find(vehicle => vehicle._id.toString() === vehicleObject);
     
     
         if (!selectedVehicle) {
             return res.status(400).json({ message: "Invalid vehicle selected" });
         }
+        const validServices = await Service.find({}, { name: 1, _id: 0 });
 
-        const validServices = await Service.find({}, { name: 1, _id: 0 }); 
-
-        const validServiceNames = validServices.map(service => service.name);
-
-        const selectedServices = services.filter(service => validServiceNames.includes(service));
-
+        const validServiceNames = validServices.map(service => service.name.trim().toLowerCase());
+     
+        const selectedServices = services.filter(service => 
+          validServiceNames.includes(service.trim().toLowerCase())
+        );
+        
         if (selectedServices.length === 0) {
             return res.status(400).json({ message: "Please select at least one valid service" });
         }
@@ -52,6 +53,7 @@ const createAppointment = async (req, res) => {
     // Step 1: Create a new appointment
     const newAppointment = new Appointment({
       userId,
+      vehicleObject,
       vehicleId,
       vehicleNumber: selectedVehicle.vehicleNumber,
       model: selectedVehicle.model,

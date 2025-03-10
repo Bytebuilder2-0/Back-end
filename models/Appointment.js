@@ -1,18 +1,18 @@
 const mongoose = require("mongoose");
 
 const appointmentSchema = new mongoose.Schema({
+        userId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User", // Reference to the User model
+            required: true,
+        },
 
-    userId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User", // Reference to the User model
-        required: true
-    },
-    vehicleId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Vehicle", // Reference to the Vehicle model
-        required: true
-    },
-
+        vehicleId: { type: String },
+        vehicleObject:{
+            type:  mongoose.Schema.Types.ObjectId,
+            ref:"Vehicle", // Reference to the Vehicle model
+            required:true
+        },
         vehicleNumber: { type: String, required: true },
         model: { type: String, required: true },
         issue: { type: String, required: false  },    
