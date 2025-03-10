@@ -14,13 +14,13 @@ const createAppointment = async (req, res) => {
         if (!vehicleId || !services || !preferredTime || !expectedDeliveryDate || !contactNumber) {
             return res.status(400).json({ message: "All fields are required" });
         }
-
-        console.log("Request User Object:", req.user); 
-        const userId = req.user.id;
+         const userId = req.params.user_id
+      
     
         const userVehicles = await Vehicle.find({ user: userId });
 
         const selectedVehicle = userVehicles.find(vehicle => vehicle._id.toString() === vehicleId);
+    
     
         if (!selectedVehicle) {
             return res.status(400).json({ message: "Invalid vehicle selected" });
