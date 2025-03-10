@@ -8,6 +8,11 @@ const appointmentSchema = new mongoose.Schema({
         },
 
         vehicleId: { type: String },
+        vehicleObject:{
+            type:  mongoose.Schema.Types.ObjectId,
+            ref:"Vehicle", // Reference to the Vehicle model
+            required:true
+        },
         vehicleNumber: { type: String, required: true },
         model: { type: String, required: true },
         issue: { type: String, required: false },
