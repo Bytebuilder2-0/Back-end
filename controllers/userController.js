@@ -1,9 +1,10 @@
 const User = require("../models/User");
+const Vehicle = require("../models/Vehicle")
 const bcrypt = require("bcrypt");
 
 const registerUser = async(req, res) => {
     try {
-        const { name, email, password } = req.body;
+        const { name, email, password, vehicles } = req.body;
 
         // Check if the user already exists
         const existingUser = await User.findOne({ email });
@@ -22,7 +23,21 @@ const registerUser = async(req, res) => {
         });
 
         // Save the user
-        await newUser.save();
+        const savedUser = await newUser.save();
+
+        if (vehicles) {
+
+            const { model, vehicleNumber, vehicleType } = vehicles; 
+
+            const newVehicle = new Vehicle({
+                user: savedUser._id, // Link vehicle to user
+                model,
+                vehicleNumber,
+                vehicleType
+            });
+
+            await newVehicle.save();
+        }
 
         res.status(201).json({ message: "User registered successfully", user: newUser });
     } catch (error) {
