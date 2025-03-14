@@ -1,5 +1,26 @@
 const Service = require("../models/Service");
 
+const setServices =  async(req,res) => {
+
+    try{
+
+        const { name, description } = req.body;
+        
+        const newService = new Service({
+            name,
+            description
+    });
+
+    await newService.save();
+    res.status(201).json({ message: "service created successfully", service:Service });
+    }
+
+    catch(error){
+        res.status(500).json({ message: "Internal Server Error", error: error.message });
+    }
+}
+
+
 const getServices = async (req, res) => {
     try {
         const services = await Service.find();
@@ -10,4 +31,4 @@ const getServices = async (req, res) => {
     }
 };
 
-module.exports = { getServices };
+module.exports = { getServices, setServices };
