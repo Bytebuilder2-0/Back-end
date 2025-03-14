@@ -7,7 +7,7 @@ const appointmentSchema = new mongoose.Schema({
             required: true,
         },
 
-        vehicleId: { type: String },
+        vehicleId: { type: String , default:"1234"},
         vehicleObject:{
             type:  mongoose.Schema.Types.ObjectId,
             ref:"Vehicle", // Reference to the Vehicle model
@@ -41,7 +41,6 @@ const appointmentSchema = new mongoose.Schema({
         }, ],
         services: [{
             type: String,
-            enum: ["A/C repair", "Oil repair", "Break Services"],
             required: true,
         }, ],
         preferredTime: { type: String, required: true },
