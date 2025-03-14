@@ -5,7 +5,6 @@ const serviceSchema = new mongoose.Schema({
        type: String, 
        required: true, 
        unique:true,
-       enum: ["A/C repair", "Oil change", "Break Services"] 
    },
    description: { 
        type: String, 
