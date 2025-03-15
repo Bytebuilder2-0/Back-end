@@ -22,13 +22,15 @@ const setServices =  async(req,res) => {
 
 
 const getServices = async (req, res) => {
-    try {
-        const services = await Service.find();
-        res.status(200).json(services);
-    } catch (error) {
-        console.error("Error fetching services:", error);
-        res.status(500).json({ error: "Server error" });
-    }
+  try {
+
+    const services = await Service.find({});
+    console.log("Fetched services:", services); 
+    res.status(200).json(services);
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
 
 module.exports = { getServices, setServices };
