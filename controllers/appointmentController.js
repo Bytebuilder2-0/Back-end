@@ -54,7 +54,6 @@ const createAppointment = async(req, res) => {
     const newAppointment = new Appointment({
       userId,
       vehicleObject,
-      vehicleId : "1234",
       vehicleNumber: selectedVehicle.vehicleNumber,
       model: selectedVehicle.model,
       issue,
@@ -64,6 +63,7 @@ const createAppointment = async(req, res) => {
       expectedDeliveryDate: deliveryDate,
       contactNumber
   });
+      
 
         await newAppointment.save();
 
@@ -93,6 +93,26 @@ const createAppointment = async(req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+
+const fetchApppintmetDetails = async(req,res)=>{
+    try {
+        const appointmentId = req.params.appointment_id; 
+        
+        const appointment = await Appointment.findById(appointmentId);
+    
+        if (!appointment) {
+          return res.status(404).json({ message: "Appointment not found" });
+        }
+        
+        res.status(200).json(appointment);
+      } catch (error) {
+        console.error("Error fetching appointment:", error);
+        res.status(500).json({ error: error.message });
+      }
+    };
+
+
 
 // 2️⃣ Get all appointments (Supervisor dashboarrd)
 const getAppointments = async(req, res) => {
@@ -216,7 +236,7 @@ module.exports = {
     createAppointment,
     getAppointments,
     updateWorkload,
-
+    fetchApppintmetDetails,
     getWorkload,
     suggestionWrite,
 };
