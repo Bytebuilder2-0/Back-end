@@ -5,9 +5,8 @@ const {
   updateWorkload,
   suggestionWrite,
   getWorkload,
+  fetchApppintmetDetails
 } = require("../controllers/appointmentController.js");
-// const {  getAppointments, updateWorkload, suggestionWrite } = require("../controllers/appointmentController.js");
-// const { createAppointment } = require("../controllers/createAppoinment.js");
 const {authMiddleware} = require("../middlewares/userAuthMiddleware.js"); 
 const {  getServices } = require("../controllers/serviceController");
 const { getUserVehicles } = require("../controllers/vehicleController");
@@ -18,6 +17,8 @@ const router = express.Router();
 
 router.post("/:user_id", createAppointment);
 router.get("/services", getServices); 
+router.get("/:appointment_id", fetchApppintmetDetails); 
+
 router.get("/vehicles/:user_id", getUserVehicles); 
 
 router.get("/", getAppointments);

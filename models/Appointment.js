@@ -13,6 +13,7 @@ const appointmentSchema = new mongoose.Schema({
             ref:"Vehicle", // Reference to the Vehicle model
             required:true
         },
+        appointmentId : { type: String , default:"123D"},
         vehicleNumber: { type: String, required: true },
         model: { type: String, required: true },
         issue: { type: String, required: false },
@@ -20,6 +21,7 @@ const appointmentSchema = new mongoose.Schema({
             type: String,
             enum: [
                 "Pending",
+                "Cancelled",
                 "Confirmed",
                 "Reject1",
                 "Waiting for Technician Confirmation",
