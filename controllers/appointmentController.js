@@ -11,6 +11,7 @@ const createAppointment = async(req, res) => {
 
     const { vehicleObject,services, issue, preferredTime, expectedDeliveryDate, contactNumber } = req.body;
 
+
         if ( !services || !preferredTime || !expectedDeliveryDate || !contactNumber) {
             return res.status(400).json({ message: "All fields are required......" });
         }
