@@ -27,17 +27,19 @@ const registerUser = async(req, res) => {
 
         if (vehicles) {
 
-            const { model, vehicleNumber, vehicleType } = vehicles; 
+            for (const vehicle of vehicles) {
+                const { model, vehicleNumber, vehicleType } = vehicle;
 
-            const newVehicle = new Vehicle({
-                user: savedUser._id, // Link vehicle to user
-                model,
-                vehicleNumber,
-                vehicleType
-            });
+                const newVehicle = new Vehicle({
+                    user: savedUser._id, // Link vehicle to user
+                    model,
+                    vehicleNumber,
+                    vehicleType
+                });
 
             await newVehicle.save();
         }
+    }
 
         res.status(201).json({ message: "User registered successfully", user: newUser });
     } catch (error) {
