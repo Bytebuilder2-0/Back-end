@@ -6,6 +6,7 @@ const connectDB = require("./config/db.js");
 
 const appointmentRoutes = require("./routes/appointmentRoutes.js");
 const technicianRoutes = require("./routes/technicianRoutes.js");
+const userRoutes  = require("./routes/userRoutes.js");
 
 dotenv.config();
 connectDB();
@@ -17,6 +18,8 @@ app.use(bodyParser.json());
 // Mount appointment routes
 app.use("/api/appointments", appointmentRoutes);
 app.use("/api/technicians", technicianRoutes);
+app.use("/api/user", userRoutes);
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
