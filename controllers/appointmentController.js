@@ -9,36 +9,36 @@ const createAppointment = async(req, res) => {
     try {
 
 
-    const { vehicleObject,services, issue, preferredTime, expectedDeliveryDate, contactNumber } = req.body;
+        const { vehicleObject, services, issue, preferredTime, expectedDeliveryDate, contactNumber } = req.body;
 
 
-        if ( !services || !preferredTime || !expectedDeliveryDate || !contactNumber) {
+        if (!services || !preferredTime || !expectedDeliveryDate || !contactNumber) {
             return res.status(400).json({ message: "All fields are required......" });
         }
-         const userId = req.params.user_id
-      
-    
+        const userId = req.params.user_id
+
+
         const userVehicles = await Vehicle.find({ user: userId });
 
         const selectedVehicle = userVehicles.find(vehicle => vehicle._id.toString() === vehicleObject);
-    
-    
+
+
         if (!selectedVehicle) {
             return res.status(400).json({ message: "Invalid vehicle selected" });
         }
         const validServices = await Service.find({}, { name: 1, _id: 0 });
 
         const validServiceNames = validServices.map(service => service.name.trim().toLowerCase());
-     
-        const selectedServices = services.filter(service => 
-          validServiceNames.includes(service.trim().toLowerCase())
+
+        const selectedServices = services.filter(service =>
+            validServiceNames.includes(service.trim().toLowerCase())
         );
-        
+
         if (selectedServices.length === 0) {
             return res.status(400).json({ message: "Please select at least one valid service" });
         }
 
-        if (!/^\d{10}$/.test(contactNumber)) {
+        if (!/^\d{11}$/.test(contactNumber)) {
             return res.status(400).json({ message: "Invalid contact number" });
         }
 
@@ -51,20 +51,20 @@ const createAppointment = async(req, res) => {
             return res.status(400).json({ message: "Expected delivery date must be in the future" });
         }
 
-    // Step 1: Create a new appointment
-    const newAppointment = new Appointment({
-      userId,
-      vehicleObject,
-      vehicleNumber: selectedVehicle.vehicleNumber,
-      model: selectedVehicle.model,
-      issue,
-      status: "Pending",
-      services: selectedServices,
-      preferredTime,
-      expectedDeliveryDate: deliveryDate,
-      contactNumber
-  });
-      
+        // Step 1: Create a new appointment
+        const newAppointment = new Appointment({
+            userId,
+            vehicleObject,
+            vehicleNumber: selectedVehicle.vehicleNumber,
+            model: selectedVehicle.model,
+            issue,
+            status: "Pending",
+            services: selectedServices,
+            preferredTime,
+            expectedDeliveryDate: deliveryDate,
+            contactNumber
+        });
+
 
         await newAppointment.save();
 
@@ -96,22 +96,22 @@ const createAppointment = async(req, res) => {
 };
 
 
-const fetchApppintmetDetails = async(req,res)=>{
+const fetchApppintmetDetails = async(req, res) => {
     try {
-        const appointmentId = req.params.appointment_id; 
-        
+        const appointmentId = req.params.appointment_id;
+
         const appointment = await Appointment.findById(appointmentId);
-    
+
         if (!appointment) {
-          return res.status(404).json({ message: "Appointment not found" });
+            return res.status(404).json({ message: "Appointment not found" });
         }
-        
+
         res.status(200).json(appointment);
-      } catch (error) {
+    } catch (error) {
         console.error("Error fetching appointment:", error);
         res.status(500).json({ error: error.message });
-      }
-    };
+    }
+};
 
 
 
