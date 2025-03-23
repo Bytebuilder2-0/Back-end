@@ -7,13 +7,13 @@ const appointmentSchema = new mongoose.Schema({
             required: true,
         },
 
-        vehicleId: { type: String , default:"1234"},
-        vehicleObject:{
-            type:  mongoose.Schema.Types.ObjectId,
-            ref:"Vehicle", // Reference to the Vehicle model
-            required:true
+        vehicleId: { type: String, default: "1234" },
+        vehicleObject: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Vehicle", // Reference to the Vehicle model
+            required: true
         },
-        appointmentId : { type: String , default:"123D"},
+        appointmentId: { type: String, default: "123D" },
         vehicleNumber: { type: String, required: true },
         model: { type: String, required: true },
         issue: { type: String, required: false },
@@ -61,6 +61,12 @@ const appointmentSchema = new mongoose.Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: "Budget",
             default: null,
+        },
+        payment: {
+            type: String,
+            enum: ["Pending", "Paid"],
+            default: "Pending",
+
         },
     }, { timestamps: true } // Auto-adds createdAt & updatedAt
 );

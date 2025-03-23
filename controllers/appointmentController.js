@@ -119,7 +119,7 @@ const fetchApppintmetDetails = async(req, res) => {
 const getAppointments = async(req, res) => {
     try {
         const appointments = await Appointment.find({},
-            "vehicleId vehicleNumber model issue workload tech status techMessage contactNumber"
+            "vehicleId vehicleNumber model issue workload tech status techMessage contactNumber payment"
         );
         res.json(appointments);
     } catch (error) {
