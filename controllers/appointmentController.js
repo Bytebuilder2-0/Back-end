@@ -1,4 +1,5 @@
 const Appointment = require("../models/Appointment.js");
+const User = require('../models/User');
 const mongoose = require("mongoose");
 const Vehicle = require("../models/Vehicle");
 const Service = require("../models/Service");
@@ -112,6 +113,55 @@ const fetchApppintmetDetails = async(req,res)=>{
         res.status(500).json({ error: error.message });
       }
     };
+
+//get all appointments related to user
+
+const getUserAppointments = async(req, res)=>{
+    try {
+        const { userId } = req.params;
+       
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid user ID format'
+            });
+        }
+        const userObjectId = new mongoose.Types.ObjectId(userId);
+
+        const userExists = await User.exists({ _id: userObjectId });
+        if (!userExists) {
+            console.log(`User ${userId} not found`);
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+        // Find all appointments for the user
+        const appointments = await Appointment.find({ userId:userObjectId })
+        .lean(); 
+
+        console.log(`Found ${appointments.length} appointments for user ${userId}`);
+        console.log('Found appointments:', appointments); 
+
+        if (appointments.length === 0) {
+            console.log(`[WARN] No appointments found for user ${userId}`);
+        }
+        res.status(200).json({
+            success: true,
+            count: appointments.length,
+            data: appointments
+          });
+}
+catch (error) {
+    console.error('Error fetching user appointments:', error);
+    if (!res.headersSent)
+    {res.status(500).json({
+      success: false,
+      message: 'Server error while fetching appointments',
+      error: error.message
+    });
+}}
+};
 
 
 
@@ -235,6 +285,7 @@ const getWorkload = (req, res) => {
 
 module.exports = {
     createAppointment,
+    getUserAppointments,
     getAppointments,
     updateWorkload,
     fetchApppintmetDetails,
