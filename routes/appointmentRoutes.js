@@ -2,6 +2,7 @@ const express = require("express");
 const {
   createAppointment,
   getAppointments,
+  getUserAppointments,
   updateWorkload,
   suggestionWrite,
   getWorkload,
@@ -16,8 +17,10 @@ const { updateAppointmentStatus } = require("../controllers/statusUpdate.js");
 const router = express.Router();
 
 router.post("/:user_id", createAppointment);
+router.get("/user/:userId",getUserAppointments);
 router.get("/services", getServices); 
 router.get("/:appointment_id", fetchApppintmetDetails); 
+
 
 router.get("/vehicles/:user_id", getUserVehicles); 
 
