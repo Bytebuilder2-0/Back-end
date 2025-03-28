@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const appointmentSchema = new mongoose.Schema({
-        userId: {
+        userId : {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User", // Reference to the User model
             required: true,
