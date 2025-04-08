@@ -9,12 +9,9 @@ const technicianRoutes = require("./routes/technicianRoutes.js");
 const budgetRoutes = require("./routes/budgetRoutes.js");
 const userRoutes = require("./routes/userRoutes.js");
 const serviceRoutes = require("./routes/serviceRoutes.js");
-<<<<<<< HEAD
 const authRoutes = require("./routes/authRouter.js");
 const authMiddleware = require("./middlewares/userAuthMiddleware.js");
-=======
 const feedbackRoutes = require("./routes/feedbackRoutes");
->>>>>>> aa7729dde1ed51464e4a3f6b79a8cbb9c676b27b
 
 dotenv.config();
 connectDB();
@@ -28,13 +25,11 @@ app.use("/api/appointments", appointmentRoutes);
 app.use("/api/technicians", technicianRoutes);
 app.use("/api/budget", budgetRoutes);
 app.use("/api/user", userRoutes);
-<<<<<<< HEAD
+app.use("/api/feedback", feedbackRoutes);
+app.use("/api/services", serviceRoutes);
 app.use("/api/auth", authRoutes);
 
-=======
-app.use("/api/feedback", feedbackRoutes);
->>>>>>> aa7729dde1ed51464e4a3f6b79a8cbb9c676b27b
-app.use("/api/services", serviceRoutes);
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
