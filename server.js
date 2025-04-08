@@ -9,6 +9,8 @@ const technicianRoutes = require("./routes/technicianRoutes.js");
 const budgetRoutes = require("./routes/budgetRoutes.js");
 const userRoutes = require("./routes/userRoutes.js");
 const serviceRoutes = require("./routes/serviceRoutes.js");
+const authRoutes = require("./routes/authRouter.js");
+const authMiddleware = require("./middlewares/userAuthMiddleware.js");
 
 dotenv.config();
 connectDB();
@@ -22,6 +24,7 @@ app.use("/api/appointments", appointmentRoutes);
 app.use("/api/technicians", technicianRoutes);
 app.use("/api/budget", budgetRoutes);
 app.use("/api/user", userRoutes);
+app.use("/api/auth", authRoutes);
 
 app.use("/api/services", serviceRoutes);
 
