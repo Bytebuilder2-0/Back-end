@@ -282,7 +282,17 @@ const getWorkload = (req, res) => {
             res.status(500).json({ message: "Error fetching workload", error });
         });
 };
+//chamod
+const getAssigned = async (req, res) => {
+    try {
+      const jobs = await Appointment.find({ status: "Assigned" });
+      res.json(jobs);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  }
 
+//chamod
 module.exports = {
     createAppointment,
     getUserAppointments,
@@ -291,4 +301,5 @@ module.exports = {
     fetchApppintmetDetails,
     getWorkload,
     suggestionWrite,
+    getAssigned,
 };
