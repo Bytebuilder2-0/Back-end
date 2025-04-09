@@ -64,9 +64,8 @@ const createAppointment = async(req, res) => {
             preferredTime,
             expectedDeliveryDate: deliveryDate,
             contactNumber,
-            reason, //add meeee
+            reason, //add new part for Tehnician
         });
-
 
         await newAppointment.save();
 
