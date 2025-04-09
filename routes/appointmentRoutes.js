@@ -28,9 +28,9 @@ router.get("/vehicles/:user_id", getUserVehicles);
 router.get("/", getAppointments);
 router.put("/:id/workload", updateWorkload);
 router.get("/:id/workload", getWorkload);
-//chamod
+//me
 router.get("/completed",getAssigned);
-//chamad
+
 
 router.put("/:appointmentId/assign2", assignTechnician);
 
