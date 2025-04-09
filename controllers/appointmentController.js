@@ -63,7 +63,8 @@ const createAppointment = async(req, res) => {
             services: selectedServices,
             preferredTime,
             expectedDeliveryDate: deliveryDate,
-            contactNumber
+            contactNumber,
+            reason, //add meeee
         });
 
 
