@@ -6,7 +6,8 @@ const {
   updateWorkload,
   suggestionWrite,
   getWorkload,
-  fetchApppintmetDetails
+  fetchApppintmetDetails,
+  getAssigned
 } = require("../controllers/appointmentController.js");
 const {authMiddleware} = require("../middlewares/userAuthMiddleware.js"); 
 const {  getServices } = require("../controllers/serviceController");
@@ -27,6 +28,9 @@ router.get("/vehicles/:user_id", getUserVehicles);
 router.get("/", getAppointments);
 router.put("/:id/workload", updateWorkload);
 router.get("/:id/workload", getWorkload);
+//me
+router.get("/completed",getAssigned);
+
 
 router.put("/:appointmentId/assign2", assignTechnician);
 
