@@ -3,6 +3,7 @@ const {
   getAllServices,
   addService,
   updateService,
+  toggleService,
 } = require("../controllers/serviceControllerManage");
 
 const router = express.Router();
@@ -14,5 +15,8 @@ router.get("/", getAllServices);
 router.post("/", addService);
 
 router.put("/update/:id", updateService);
+
+// Toggle service selection (update selected state)
+router.put("/:id", toggleService);
 
 module.exports = router;
