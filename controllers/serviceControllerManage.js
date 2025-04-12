@@ -9,3 +9,17 @@ exports.getAllServices = async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 };
+
+// Add a new service
+exports.addService = async (req, res) => {
+  try {
+    const { name, type } = req.body;
+    const newService = new ServiceManage({ name, type });
+    await newService.save();
+    res.status(201).json(newService);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+// Toggle the selection state of a service
