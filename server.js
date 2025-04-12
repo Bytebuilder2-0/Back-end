@@ -12,6 +12,7 @@ const serviceRoutes = require("./routes/serviceRoutes.js");
 const authRoutes = require("./routes/authRouter.js");
 const authMiddleware = require("./middlewares/userAuthMiddleware.js");
 const feedbackRoutes = require("./routes/feedbackRoutes");
+const serviceManage = require("./routes/serviceManageRoutes.js");
 
 dotenv.config();
 connectDB();
@@ -28,8 +29,7 @@ app.use("/api/user", userRoutes);
 app.use("/api/feedback", feedbackRoutes);
 app.use("/api/services", serviceRoutes);
 app.use("/api/auth", authRoutes);
-
-
+app.use("/api/services", serviceManage);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
