@@ -45,3 +45,18 @@ exports.deleteService = async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 };
+
+// Update service name
+exports.updateService = async (req, res) => {
+  try {
+    const { name } = req.body;
+    const updatedService = await ServiceManage.findByIdAndUpdate(
+      req.params.id,
+      { name },
+      { new: true }
+    );
+    res.status(200).json(updatedService);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
