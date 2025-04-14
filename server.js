@@ -21,7 +21,7 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-// Mount appointment routes
+//Routes
 app.use("/api/appointments", appointmentRoutes);
 app.use("/api/technicians", technicianRoutes);
 app.use("/api/budget", budgetRoutes);
