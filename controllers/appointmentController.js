@@ -5,12 +5,12 @@ const Vehicle = require("../models/Vehicle");
 const Service = require("../models/Service");
 const Budget = require("../models/Budget.js");
 
-// 1️⃣ Create a new appointment (Client submits form)
+// 1️ Create a new appointment (Client submits form)
 const createAppointment = async(req, res) => {
     try {
 
 
-        const { vehicleObject, services, issue, preferredTime, expectedDeliveryDate, contactNumber, reason } = req.body;
+        const { vehicleObject, services, issue, preferredTime, expectedDeliveryDate, contactNumber } = req.body;
 
 
         if (!services || !preferredTime || !expectedDeliveryDate || !contactNumber) {
@@ -165,11 +165,11 @@ const getUserAppointments = async(req, res) => {
 
 
 
-// 2️⃣ Get all appointments (Supervisor dashboarrd)
+// 2️ Get all appointments (Supervisor dashboarrd)
 const getAppointments = async(req, res) => {
     try {
         const appointments = await Appointment.find({},
-            "vehicleId vehicleNumber model issue workload tech status techMessage contactNumber payment"
+            "vehicleId vehicleNumber model issue workload tech status techMessage contactNumber payment appointmentId expectedDeliveryDate"
         );
         res.json(appointments);
     } catch (error) {
@@ -178,7 +178,7 @@ const getAppointments = async(req, res) => {
 };
 
 
-// 3️⃣ Update workload for an appointment (Supervisor updates workload)
+// 3️ Update workload for an appointment (Supervisor updates workload)
 const updateWorkload = async(req, res) => {
     const { workload } = req.body; // Expecting an array of objects
     const { id } = req.params;
