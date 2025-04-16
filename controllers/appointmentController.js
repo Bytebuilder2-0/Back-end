@@ -5,12 +5,12 @@ const Vehicle = require("../models/Vehicle");
 const Service = require("../models/Service");
 const Budget = require("../models/Budget.js");
 
-// 1️⃣ Create a new appointment (Client submits form)
+// 1️ Create a new appointment (Client submits form)
 const createAppointment = async(req, res) => {
     try {
 
 
-        const { vehicleObject, services, issue, preferredTime, expectedDeliveryDate, contactNumber, reason } = req.body;
+        const { vehicleObject, services, issue, preferredTime, expectedDeliveryDate, contactNumber } = req.body;
 
 
         if (!services || !preferredTime || !expectedDeliveryDate || !contactNumber) {
