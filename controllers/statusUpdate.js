@@ -1,5 +1,7 @@
 const Appointment = require("../models/Appointment");
 
+//update the status of the appointmnet according to the activity done for the specific appointent
+
 const updateAppointmentStatus = async(req, res) => {
     try {
         const { status } = req.body;
