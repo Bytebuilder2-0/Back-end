@@ -10,7 +10,7 @@ const createAppointment = async(req, res) => {
     try {
 
 
-        const { vehicleObject, services, issue, preferredTime, expectedDeliveryDate, contactNumber } = req.body;
+        const { vehicleObject, services, issue, preferredTime, expectedDeliveryDate, contactNumber, reason } = req.body;
 
 
         if (!services || !preferredTime || !expectedDeliveryDate || !contactNumber) {
