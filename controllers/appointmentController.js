@@ -64,7 +64,7 @@ const createAppointment = async(req, res) => {
             preferredTime,
             expectedDeliveryDate: deliveryDate,
             contactNumber,
-            reason, //add new part for Tehnician
+            // reason, //add new part for Tehnician
         });
 
         await newAppointment.save();
@@ -116,10 +116,10 @@ const fetchApppintmetDetails = async(req, res) => {
 
 //get all appointments related to user
 
-const getUserAppointments = async(req, res)=>{
+const getUserAppointments = async(req, res) => {
     try {
         const { userId } = req.params;
-       
+
         if (!mongoose.Types.ObjectId.isValid(userId)) {
             return res.status(400).json({
                 success: false,
@@ -137,11 +137,11 @@ const getUserAppointments = async(req, res)=>{
             });
         }
         // Find all appointments for the user
-        const appointments = await Appointment.find({ userId:userObjectId })
-        .lean(); 
+        const appointments = await Appointment.find({ userId: userObjectId })
+            .lean();
 
         console.log(`Found ${appointments.length} appointments for user ${userId}`);
-        console.log('Found appointments:', appointments); 
+        console.log('Found appointments:', appointments);
 
         if (appointments.length === 0) {
             console.log(`[WARN] No appointments found for user ${userId}`);
@@ -150,17 +150,17 @@ const getUserAppointments = async(req, res)=>{
             success: true,
             count: appointments.length,
             data: appointments
-          });
-}
-catch (error) {
-    console.error('Error fetching user appointments:', error);
-    if (!res.headersSent)
-    {res.status(500).json({
-      success: false,
-      message: 'Server error while fetching appointments',
-      error: error.message
-    });
-}}
+        });
+    } catch (error) {
+        console.error('Error fetching user appointments:', error);
+        if (!res.headersSent) {
+            res.status(500).json({
+                success: false,
+                message: 'Server error while fetching appointments',
+                error: error.message
+            });
+        }
+    }
 };
 
 
@@ -283,14 +283,14 @@ const getWorkload = (req, res) => {
         });
 };
 //chamod
-const getAssigned = async (req, res) => {
+const getAssigned = async(req, res) => {
     try {
-      const jobs = await Appointment.find({ status: "Assigned" });
-      res.json(jobs);
+        const jobs = await Appointment.find({ status: "Assigned" });
+        res.json(jobs);
     } catch (err) {
-      res.status(500).json({ error: err.message });
+        res.status(500).json({ error: err.message });
     }
-  }
+}
 
 //chamod
 module.exports = {
