@@ -25,7 +25,7 @@ router.get("/:appointment_id", fetchApppintmetDetails); //Fetch into supervisor 
 
 router.get("/vehicles/:user_id", getUserVehicles);
 
-router.get("/", getAppointments);
+router.get("/", getAppointments); //fetch all appointments to supervisor dashboard
 router.put("/:id/workload", updateWorkload);
 router.get("/:id/workload", getWorkload);
 //me

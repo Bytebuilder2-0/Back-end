@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const appointmentSchema = new mongoose.Schema({
-        userId : {
+        userId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User", // Reference to the User model
             required: true,
@@ -21,15 +21,15 @@ const appointmentSchema = new mongoose.Schema({
         status: {
             type: String,
             enum: [
-                "Pending",
-                "Cancelled",
-                "Confirmed",
-                "Reject1",
-                "Waiting for Technician Confirmation",
-                "Accepted",
-                "Reject2",
-                "Task Done",
-                "Paid",
+                "Pending", //initial deafult status
+                "Cancelled", //customer cancelling the appintment
+                "Confirmed", //intial confirmation by the supervisor 
+                "Reject1", //reject by the supervisor
+                "Waiting for Technician Confirmation", //tech confirmation waiting
+                "Accepted", //tech accepted
+                "Reject2", //tech rejected
+                "Task Done", //task completed by tech
+                "Paid", //money paid by the customer
             ],
             default: "Pending",
         },
