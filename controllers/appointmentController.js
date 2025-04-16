@@ -169,7 +169,7 @@ const getUserAppointments = async(req, res) => {
 const getAppointments = async(req, res) => {
     try {
         const appointments = await Appointment.find({},
-            "vehicleId vehicleNumber model issue workload tech status techMessage contactNumber payment appointmentId"
+            "vehicleId vehicleNumber model issue workload tech status techMessage contactNumber payment appointmentId expectedDeliveryDate"
         );
         res.json(appointments);
     } catch (error) {
