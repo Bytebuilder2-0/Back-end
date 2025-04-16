@@ -1,6 +1,6 @@
 const Appointment = require("../models/Appointment");
 
-//update the status of the appointmnet according to the activity done for the specific appointent
+//update the status of the appointmnet according to the activity done for the specific appointent..resulting update or delete the appointmnet
 
 const updateAppointmentStatus = async(req, res) => {
     try {
