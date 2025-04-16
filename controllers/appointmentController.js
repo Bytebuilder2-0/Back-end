@@ -165,11 +165,11 @@ const getUserAppointments = async(req, res) => {
 
 
 
-// 2️⃣ Get all appointments (Supervisor dashboarrd)
+// 2️ Get all appointments (Supervisor dashboarrd)
 const getAppointments = async(req, res) => {
     try {
         const appointments = await Appointment.find({},
-            "vehicleId vehicleNumber model issue workload tech status techMessage contactNumber payment"
+            "vehicleId vehicleNumber model issue workload tech status techMessage contactNumber payment appointmentId"
         );
         res.json(appointments);
     } catch (error) {
@@ -178,7 +178,7 @@ const getAppointments = async(req, res) => {
 };
 
 
-// 3️⃣ Update workload for an appointment (Supervisor updates workload)
+// 3️ Update workload for an appointment (Supervisor updates workload)
 const updateWorkload = async(req, res) => {
     const { workload } = req.body; // Expecting an array of objects
     const { id } = req.params;
