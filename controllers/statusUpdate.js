@@ -6,6 +6,13 @@ const updateAppointmentStatus = async(req, res) => {
     try {
         const { status } = req.body;
 
+        if (status === "reject1") {
+            const deletedAppointment = await Appointment.findByIdAndDelete(req.params.appointmentId);
+            if (!deletedAppointment) {
+                return res, status(404).json({ message: "Appointment Not Found" });
+            }
+            return res.json({ message: "Appointment rejected and deleted successfully" });
+        }
         const appointment = await Appointment.findByIdAndUpdate(
             req.params.appointmentId, { status }, { new: true }
         );
