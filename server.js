@@ -18,10 +18,12 @@ dotenv.config();
 connectDB();
 
 const app = express();
+
+//Middlewares
 app.use(cors());
 app.use(bodyParser.json());
 
-// Mount appointment routes
+//Routes
 app.use("/api/appointments", appointmentRoutes);
 app.use("/api/technicians", technicianRoutes);
 app.use("/api/budget", budgetRoutes);
