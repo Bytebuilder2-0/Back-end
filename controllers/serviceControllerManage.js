@@ -1,14 +1,7 @@
 const ServiceManage = require("../models/serviceManage");
 
 // Fetch all services
-exports.getAllServices = async (req, res) => {
-  try {
-    const services = await ServiceManage.find();
-    res.status(200).json(services);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-};
+exports.getAllServices = async (req, res) => {};
 
 // Add a new service
 exports.addService = async (req, res) => {
@@ -22,7 +15,7 @@ exports.addService = async (req, res) => {
   }
 };
 
-// Toggle the selection state of a service
+//  selection state of a service
 exports.toggleService = async (req, res) => {
   try {
     const updatedService = await ServiceManage.findByIdAndUpdate(
