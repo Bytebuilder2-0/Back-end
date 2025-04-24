@@ -1,7 +1,14 @@
 const Feedback = require("../models/Feedback");
 
 //  Fetch feedbacks (excluding deleted)
-const getFeedbacks = async (req, res) => {};
+const getFeedbacks = async (req, res) => {
+  try {
+    const feedbacks = await Feedback.find({ deleted: false });
+    res.status(200).json({ message: "Fetched successfully!", data: feedbacks });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
 
 // after email create i was add  agian to
 const addReply = async (req, res) => {
@@ -34,7 +41,7 @@ const updateActionStatus = async (req, res) => {
   }
 };
 
-// ✅ Soft Delete Feedback
+// Soft Delete Feedback
 const deleteFeedback = async (req, res) => {
   try {
     const { id } = req.params;
