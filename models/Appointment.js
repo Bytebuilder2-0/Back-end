@@ -16,8 +16,8 @@ const appointmentSchema = new mongoose.Schema({
         appointmentId: { type: String, default: "123D" },
         vehicleNumber: { type: String, required: true },
         model: { type: String, required: true },
-        issue: { type: String, required: false },
-        reason: { type: String, required: false, default: "ok" }, //meeeeeeeee
+        issue: { type: String, required: true },
+        reason: { type: String, required: false }, //meeeeeeeee
         status: {
             type: String,
             enum: [
@@ -28,8 +28,10 @@ const appointmentSchema = new mongoose.Schema({
                 "Waiting for Technician Confirmation", //tech confirmation waiting
                 "Accepted", //tech accepted
                 "Reject2", //tech rejected
+                "InProgress", //task is started 
                 "Task Done", //task completed by tech
                 "Paid", //money paid by the customer
+                "All done" //submit feedback and appoitment process completed
             ],
             default: "Pending",
         },
@@ -46,6 +48,7 @@ const appointmentSchema = new mongoose.Schema({
             type: String,
             required: true,
         }, ],
+        preferredDate: { type: Date, required: true },
         preferredTime: { type: String, required: true },
         expectedDeliveryDate: { type: Date, required: true },
 
