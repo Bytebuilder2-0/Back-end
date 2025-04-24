@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const serviceeddSchema = new mongoose.Schema({
   name: { type: String, required: true },
   selected: { type: Boolean, default: false },
-  type: { type: String, enum: ["customer", "garage"], required: true }, // added type
+  type: { type: String, enum: ["customer", "garage"], required: true }, // added service type
 });
 
 const ServiceManage = mongoose.model("ServiceManages", serviceeddSchema);
