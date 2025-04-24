@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-
+// service manage schema
 const serviceeddSchema = new mongoose.Schema({
   name: { type: String, required: true },
   selected: { type: Boolean, default: false },
