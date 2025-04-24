@@ -15,9 +15,11 @@ router.get("/", getAllServices);
 // Add a new service
 router.post("/", addService);
 
+//update a new service
+
 router.put("/update/:id", updateService);
 
-// Toggle service selection (update selected state)
+// update service status
 router.put("/:id", toggleService);
 
 // Delete a service
