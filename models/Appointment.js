@@ -51,7 +51,7 @@ const appointmentSchema = new mongoose.Schema({
         preferredDate: { type: Date, required: true },
         preferredTime: { type: String, required: true },
         expectedDeliveryDate: { type: Date, required: true },
-
+        
         tech: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Technician", //model name not the collection name
