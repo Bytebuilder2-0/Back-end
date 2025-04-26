@@ -9,7 +9,7 @@ const Budget = require("../models/Budget.js");
 const createAppointment = async(req, res) => {
     try {
 
-        const { vehicleObject, services, issue, preferredDate,preferredTime, expectedDeliveryDate, contactNumber} = req.body;
+        const { vehicleObject, services, issue, preferredDate, preferredTime, expectedDeliveryDate, contactNumber } = req.body;
 
 
         if (!services || !issue || !preferredDate || !expectedDeliveryDate || !contactNumber) {
@@ -26,7 +26,7 @@ const createAppointment = async(req, res) => {
         if (!selectedVehicle) {
             return res.status(400).json({ message: "Invalid vehicle selected" });
         }
-        
+
         const validServices = await Service.find({}, { name: 1, _id: 0 });
 
         const validServiceNames = validServices.map(service => service.name.trim().toLowerCase());
@@ -40,8 +40,8 @@ const createAppointment = async(req, res) => {
         }
 
         if (!/^94\d{9}$/.test(contactNumber)) {
-            return res.status(400).json({ 
-                message: "Invalid contact number (must start with '94' followed by 9 digits, e.g., 94771234567)" 
+            return res.status(400).json({
+                message: "Invalid contact number (must start with '94' followed by 9 digits, e.g., 94771234567)"
             });
         }
 
@@ -51,8 +51,8 @@ const createAppointment = async(req, res) => {
         if (deliveryDate <= new Date() && preferDate <= new Date()) {
             return res.status(400).json({ message: "Date must be in the future" });
         }
-        if (deliveryDate < preferDate){
-            return  res.status(400).json({message:"Delivery date must be future than prefered date " })
+        if (deliveryDate < preferDate) {
+            return res.status(400).json({ message: "Delivery date must be future than prefered date " })
         }
 
         if (!/^\d{1,2}:\d{2} (AM|PM)$/i.test(preferredTime)) {
@@ -69,11 +69,11 @@ const createAppointment = async(req, res) => {
             issue,
             status: "Pending",
             services: selectedServices,
-            preferredDate : preferDate,
+            preferredDate: preferDate,
             preferredTime,
             expectedDeliveryDate: deliveryDate,
             contactNumber
-            
+
         });
 
         await newAppointment.save();
@@ -291,7 +291,20 @@ const getWorkload = (req, res) => {
             res.status(500).json({ message: "Error fetching workload", error });
         });
 };
-//chamod
+
+const getCount = async(req, res) => {
+        try {
+            const total = await Appointment.countDocuments();
+            const pending = await Appointment.countDocuments({ status: 'Pending' });
+            const confirmed = await Appointment.countDocuments({ status: 'Confirmed' });
+
+            res.json({ total, pending, confirmed });
+        } catch (error) {
+            console.error('Error fetching appointment counts:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    }
+    //chamod
 const getAssigned = async(req, res) => {
     try {
         const jobs = await Appointment.find({ status: "Assigned" });
@@ -310,5 +323,6 @@ module.exports = {
     fetchApppintmetDetails,
     getWorkload,
     suggestionWrite,
+    getCount,
     getAssigned,
 };
