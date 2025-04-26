@@ -14,6 +14,9 @@ const { getServices } = require("../controllers/serviceController");
 const { getUserVehicles } = require("../controllers/vehicleController");
 const { assignTechnician } = require("../controllers/assignTechnician.js");
 const { updateAppointmentStatus } = require("../controllers/statusUpdate.js");
+const { tStatusUpdate } = require("../controllers/TStatusUpdate.js");
+
+
 
 const router = express.Router();
 
@@ -35,6 +38,7 @@ router.get("/completed", getAssigned);
 router.put("/:appointmentId/assign2", assignTechnician);
 
 router.put("/:appointmentId/statusUpdate", updateAppointmentStatus);
+router.put("/:appointmentId/tStatusUpdate", tStatusUpdate);
 router.put("/:appointmentId/suggestions", suggestionWrite);
 
 module.exports = router;
