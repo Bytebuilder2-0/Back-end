@@ -1,22 +1,35 @@
 const Auth = require('../models/auth.js');  // Import your model
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const validator = require('validator');
 
 // User Registration with Role-based access
 const registerUser = async (req, res) => {
   try {
     const { email, fullName, userName, phone, password, role } = req.body;
 
-    // Check if user already exists
-    const existingUser = await Auth.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ message: 'Email is already registered' });
+
+    //----------------------------------------------------------------------------
+     // Validate input fields
+     if (!email || !fullName || !userName || !phone || !password || !role) {
+      return res.status(400).json({ message: 'All fields are required' });
+    }if (!validator.isEmail(email)) {
+      return res.status(400).json({ message: 'Invalid email format' });
+    }if (!validator.isStrongPassword(password)) {
+      return res.status(400).json({ message: 'Password must be at least 8 characters long' });
     }
 
+    
     // Validate role
     const allowedRoles = ['customer', 'technician', 'manager', 'Supervisor'];
     if (!allowedRoles.includes(role)) {
       return res.status(400).json({ message: 'Invalid Role Provided' });
+    }
+
+    // Check if user already exists
+    const existingUser = await Auth.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: 'Email is already registered' });
     }
 
     // Hash Password
@@ -51,6 +64,10 @@ const registerUser = async (req, res) => {
 const loginUser = async (req, res) => {
     try {
       const { email, password } = req.body;
+   //---------------------------------------------------------------------------------------
+      if (!email || !password) {
+        return res.status(400).json({ message: "All fields are required" });
+      }
   
       // Check if user exists
       const user = await Auth.findOne({ email });
@@ -77,7 +94,7 @@ const loginUser = async (req, res) => {
           id: user._id,
           role: user.role,
         },
-        process.env.JWT_SECRET, // Store this in your .env file
+        process.env.JWT_SECRET,
         { expiresIn: "1d" }
       );
   
@@ -96,7 +113,7 @@ const loginUser = async (req, res) => {
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: "Internal Server Error" });
-    }
-  };
+    } 
+   };
   
  module.exports = { registerUser, loginUser };
