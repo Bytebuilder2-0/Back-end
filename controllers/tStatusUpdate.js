@@ -1,18 +1,14 @@
 const Appointment = require("../models/Appointment");
 
-//update the status of the appointmnet according to the activity done for the specific appointent..resulting update or delete the appointmnet
-
+// Update the status (and optionally reason) of the appointment
 const tStatusUpdate = async (req, res) => {
   try {
-    const { status } = req.body;
-    const { reason } = req.body;
+    const { status, reason } = req.body;
 
-    
     const appointment = await Appointment.findByIdAndUpdate(
       req.params.appointmentId,
-      { status },
-      //{ reason },
-      { new: true }
+      { status, reason }, // ✅ Update both status and reason together
+      { new: true } // ✅ Return the updated document
     );
 
     if (!appointment) {
@@ -26,4 +22,4 @@ const tStatusUpdate = async (req, res) => {
   }
 };
 
-module.exports = {tStatusUpdate };
+module.exports = { tStatusUpdate };
