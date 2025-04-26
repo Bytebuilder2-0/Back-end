@@ -323,5 +323,6 @@ module.exports = {
     fetchApppintmetDetails,
     getWorkload,
     suggestionWrite,
+    getCount,
     getAssigned,
 };
