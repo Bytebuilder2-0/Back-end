@@ -1,10 +1,12 @@
+// models/serviceManage.js
 const mongoose = require("mongoose");
-// service manage schema
-const serviceeddSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  selected: { type: Boolean, default: false },
-  type: { type: String, enum: ["customer", "garage"], required: true }, // added service type
+
+const serviceSchema = new mongoose.Schema({
+  name: { type: String, required: true, unique: true }, // Service name
+  selected: { type: Boolean, default: false }, // Whether the service is active
+  description: { type: String, required: false }, // Optional description of the service
 });
 
-const ServiceManage = mongoose.model("ServiceManages", serviceeddSchema);
+const ServiceManage = mongoose.model("ServiceManagesnew", serviceSchema);
+
 module.exports = ServiceManage;
