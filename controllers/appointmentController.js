@@ -9,11 +9,10 @@ const Budget = require("../models/Budget.js");
 const createAppointment = async(req, res) => {
     try {
 
+        const { vehicleObject, services, issue, preferredDate, preferredTime, expectedDeliveryDate, contactNumber } = req.body;
 
-        const { vehicleObject, services, issue, preferredTime, expectedDeliveryDate, contactNumber } = req.body;
 
-
-        if (!services || !preferredTime || !expectedDeliveryDate || !contactNumber) {
+        if (!services || !issue || !preferredDate || !expectedDeliveryDate || !contactNumber) {
             return res.status(400).json({ message: "All fields are required......" });
         }
         const userId = req.params.user_id
@@ -27,6 +26,7 @@ const createAppointment = async(req, res) => {
         if (!selectedVehicle) {
             return res.status(400).json({ message: "Invalid vehicle selected" });
         }
+
         const validServices = await Service.find({}, { name: 1, _id: 0 });
 
         const validServiceNames = validServices.map(service => service.name.trim().toLowerCase());
@@ -39,18 +39,26 @@ const createAppointment = async(req, res) => {
             return res.status(400).json({ message: "Please select at least one valid service" });
         }
 
-        if (!/^\d{11}$/.test(contactNumber)) {
-            return res.status(400).json({ message: "Invalid contact number" });
+        if (!/^94\d{9}$/.test(contactNumber)) {
+            return res.status(400).json({
+                message: "Invalid contact number (must start with '94' followed by 9 digits, e.g., 94771234567)"
+            });
+        }
+
+
+        const preferDate = new Date(preferredDate);
+        const deliveryDate = new Date(expectedDeliveryDate);
+        if (deliveryDate <= new Date() && preferDate <= new Date()) {
+            return res.status(400).json({ message: "Date must be in the future" });
+        }
+        if (deliveryDate < preferDate) {
+            return res.status(400).json({ message: "Delivery date must be future than prefered date " })
         }
 
         if (!/^\d{1,2}:\d{2} (AM|PM)$/i.test(preferredTime)) {
             return res.status(400).json({ message: "Invalid preferred time format (use HH:MM AM/PM)" });
         }
 
-        const deliveryDate = new Date(expectedDeliveryDate);
-        if (deliveryDate <= new Date()) {
-            return res.status(400).json({ message: "Expected delivery date must be in the future" });
-        }
 
         // Step 1: Create a new appointment
         const newAppointment = new Appointment({
@@ -61,10 +69,11 @@ const createAppointment = async(req, res) => {
             issue,
             status: "Pending",
             services: selectedServices,
+            preferredDate: preferDate,
             preferredTime,
             expectedDeliveryDate: deliveryDate,
-            contactNumber,
-            reason, //add new part for Tehnician
+            contactNumber
+
         });
 
         await newAppointment.save();
@@ -169,7 +178,7 @@ const getUserAppointments = async(req, res) => {
 const getAppointments = async(req, res) => {
     try {
         const appointments = await Appointment.find({},
-            "vehicleId vehicleNumber model issue workload tech status techMessage contactNumber payment appointmentId expectedDeliveryDate"
+            "vehicleId vehicleNumber model issue reason workload tech status techMessage contactNumber payment appointmentId expectedDeliveryDate"
         );
         res.json(appointments);
     } catch (error) {
@@ -282,7 +291,20 @@ const getWorkload = (req, res) => {
             res.status(500).json({ message: "Error fetching workload", error });
         });
 };
-//chamod
+
+const getCount = async(req, res) => {
+        try {
+            const total = await Appointment.countDocuments();
+            const pending = await Appointment.countDocuments({ status: 'Pending' });
+            const confirmed = await Appointment.countDocuments({ status: 'Confirmed' });
+
+            res.json({ total, pending, confirmed });
+        } catch (error) {
+            console.error('Error fetching appointment counts:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    }
+    //chamod
 const getAssigned = async(req, res) => {
     try {
         const jobs = await Appointment.find({ status: "Assigned" });
@@ -301,5 +323,6 @@ module.exports = {
     fetchApppintmetDetails,
     getWorkload,
     suggestionWrite,
+    getCount,
     getAssigned,
 };
