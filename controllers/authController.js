@@ -15,8 +15,9 @@ const registerUser = async (req, res) => {
       return res.status(400).json({ message: 'All fields are required' });
     }if (!validator.isEmail(email)) {
       return res.status(400).json({ message: 'Invalid email format' });
-    }if (!validator.isStrongPassword(password)) {
-      return res.status(400).json({ message: 'Password must be at least 8 characters long' });
+    // }if (!validator.isStrongPassword(password)) {
+    //   return res.status(400).json({ message: 'Password must be at least 8 characters long' });
+    // 
     }
 
     
@@ -28,6 +29,7 @@ const registerUser = async (req, res) => {
 
     // Check if user already exists
     const existingUser = await Auth.findOne({ email });
+    console.log(existingUser);
     if (existingUser) {
       return res.status(400).json({ message: 'Email is already registered' });
     }
