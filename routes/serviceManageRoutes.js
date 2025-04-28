@@ -6,6 +6,7 @@ const {
   toggleService,
   deleteService,
   updateService,
+  updateServiceSteps,
 } = require("../controllers/serviceController");
 
 const router = express.Router();
@@ -24,5 +25,7 @@ router.put("/update/:id", updateService); // Update service name
 
 // Delete a service
 router.delete("/:id", deleteService); // Delete a service by ID
+//add step
+router.put("/steps/:id", updateServiceSteps);
 
 module.exports = router;

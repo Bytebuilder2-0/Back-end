@@ -104,6 +104,21 @@ const updateService = async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 };
+const updateServiceSteps = async (req, res) => {
+  try {
+    const { steps } = req.body;
+
+    const updatedService = await Service.findByIdAndUpdate(
+      req.params.id,
+      { steps },
+      { new: true }
+    );
+
+    res.status(200).json(updatedService);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
 
 module.exports = {
   getServices,
@@ -113,4 +128,5 @@ module.exports = {
   toggleService,
   deleteService,
   updateService,
+  updateServiceSteps,
 };

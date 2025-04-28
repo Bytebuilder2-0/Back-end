@@ -15,6 +15,12 @@ const serviceSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
+    steps: [
+      {
+        step: { type: Number },
+        description: { type: String },
+      },
+    ],
   },
   { timestamps: true }
 );
