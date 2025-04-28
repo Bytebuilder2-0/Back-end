@@ -1,4 +1,4 @@
-// models/serviceManage.js
+/*// models/serviceManage.js
 const mongoose = require("mongoose");
 
 const serviceSchema = new mongoose.Schema({
@@ -10,3 +10,4 @@ const serviceSchema = new mongoose.Schema({
 const ServiceManage = mongoose.model("ServiceManagesnew", serviceSchema);
 
 module.exports = ServiceManage;
+*/

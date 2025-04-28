@@ -1,4 +1,4 @@
-// controllers/serviceController.js
+/*// controllers/serviceController.js
 const ServiceManage = require("../models/serviceManage");
 
 // Create a new service
@@ -79,3 +79,4 @@ exports.updateService = async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 };
+*/
