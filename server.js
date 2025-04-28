@@ -10,9 +10,11 @@ const budgetRoutes = require("./routes/budgetRoutes.js");
 const userRoutes = require("./routes/userRoutes.js");
 const serviceRoutes = require("./routes/serviceRoutes.js");
 const authRoutes = require("./routes/authRouter.js");
-const authMiddleware = require("./middlewares/userAuthMiddleware.js");
+const { authMiddleware } = require("./middlewares/userAuthMiddleware.js");
 const feedbackRoutes = require("./routes/feedbackRoutes");
 const serviceManage = require("./routes/serviceManageRoutes.js");
+
+
 
 dotenv.config();
 connectDB();
@@ -23,15 +25,20 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
+
+
 //Routes
+app.use("/api/auth", authRoutes);
+app.use(authMiddleware);
+//app.use("/api/helloworld", (req, res) => res.send("Hello World")) // Apply the auth middleware to all routes below this line
 app.use("/api/appointments", appointmentRoutes);
 app.use("/api/technicians", technicianRoutes);
 app.use("/api/budget", budgetRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/feedback", feedbackRoutes);
 app.use("/api/services", serviceRoutes);
-app.use("/api/auth", authRoutes);
+
 app.use("/api/services", serviceManage);
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(` Server running on port ${PORT}`));
