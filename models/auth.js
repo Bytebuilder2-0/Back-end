@@ -28,7 +28,12 @@ const userSchema = new mongoose.Schema({
       required: true,
       enum: ["customer", "technician", "manager", "Supervisor", "admin"],
       default: "customer",
+      technicianId: { type: String },
+      managerId: { type: String },
+      supervisorId: { type: String },
+
     },
+
     isDisabled: {
       type: Boolean,
       required: true,
