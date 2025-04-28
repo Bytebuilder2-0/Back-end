@@ -1,20 +1,20 @@
 // routes/serviceManageRoutes.js
 const express = require("express");
 const {
-  getServices,
-  setServices,
+  viewServices,
+  addServices,
   toggleService,
   deleteService,
   updateService,
-} = require("../controllers/serviceControllerManage");
+} = require("../controllers/serviceController");
 
 const router = express.Router();
 
 // Fetch all services
-router.get("/", getServices);
+router.get("/", viewServices);
 
 // Add a new service
-router.post("/", setServices);
+router.post("/", addServices);
 
 // Toggle service selected status
 router.put("/:id", toggleService); // Update selected field of the service
