@@ -8,7 +8,7 @@ const appointmentRoutes = require("./routes/appointmentRoutes.js");
 const technicianRoutes = require("./routes/technicianRoutes.js");
 const budgetRoutes = require("./routes/budgetRoutes.js");
 const userRoutes = require("./routes/userRoutes.js");
-const serviceRoutes = require("./routes/serviceRoutes.js");
+
 const authRoutes = require("./routes/authRouter.js");
 const { authMiddleware } = require("./middlewares/userAuthMiddleware.js");
 const feedbackRoutes = require("./routes/feedbackRoutes");
@@ -36,7 +36,12 @@ app.use("/api/technicians", technicianRoutes);
 app.use("/api/budget", budgetRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/feedback", feedbackRoutes);
+
+
+app.use("/api/auth", authRoutes);
+
 app.use("/api/services", serviceRoutes);
+
 app.use("/api/servicesManage", serviceManage);
 
 app.use("/api/services", serviceManage);
