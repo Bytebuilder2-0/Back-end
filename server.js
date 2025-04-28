@@ -25,8 +25,8 @@ app.use(cors());
 app.use(bodyParser.json());
 
 //Routes
-//app.use("/api/auth", authRoutes);
-//app.use(authMiddleware);
+app.use("/api/auth", authRoutes);
+app.use(authMiddleware);
 //app.use("/api/helloworld", (req, res) => res.send("Hello World")) // Apply the auth middleware to all routes below this line
 app.use("/api/appointments", appointmentRoutes);
 app.use("/api/technicians", technicianRoutes);
