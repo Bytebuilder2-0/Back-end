@@ -178,7 +178,7 @@ const getUserAppointments = async(req, res) => {
 const getAppointments = async(req, res) => {
     try {
         const appointments = await Appointment.find({},
-            "vehicleId vehicleNumber model issue reason workload tech status techMessage contactNumber payment appointmentId expectedDeliveryDate"
+            "vehicleId vehicleNumber model issue reason workload tech status techMessage contactNumber payment appointmentId suggestion expectedDeliveryDate"
         );
         res.json(appointments);
     } catch (error) {
@@ -304,7 +304,7 @@ const getCount = async(req, res) => {
             res.status(500).json({ error: 'Internal server error' });
         }
     }
-    //chamod
+    
 const getAssigned = async(req, res) => {
     try {
         const jobs = await Appointment.find({ status: "Assigned" });
@@ -313,6 +313,20 @@ const getAssigned = async(req, res) => {
         res.status(500).json({ error: err.message });
     }
 }
+//chamod
+const getTechMessage = (req, res) => {
+    const appointmentId = req.params.id;
+    Appointment.findById(appointmentId)
+        .then((appointment) => {
+            if (!appointment) {
+                return res.status(404).json({ message: "Appointment not found" });
+            }
+            res.json({ techMessage: appointment.techMessage }); // Send the workload data
+        })
+        .catch((error) => {
+            res.status(500).json({ message: "Error fetching workload", error });
+        });
+};
 
 //chamod
 module.exports = {
@@ -325,4 +339,5 @@ module.exports = {
     suggestionWrite,
     getCount,
     getAssigned,
+    getTechMessage
 };
