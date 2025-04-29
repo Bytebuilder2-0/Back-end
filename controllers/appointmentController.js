@@ -346,16 +346,69 @@ const getTechMessage = (req, res) => {
     });
 };
 
+const upadateWorkloadStatus = async (req, res) => {
+    try {
+      const { appointmentId, taskId } = req.params;
+      const { status } = req.body;
+  
+      // Validate the appointmentId and taskId
+      if (!mongoose.Types.ObjectId.isValid(appointmentId)) {
+        return res.status(400).json({ message: "Invalid appointment ID" });
+      }
+  
+      if (!mongoose.Types.ObjectId.isValid(taskId)) {
+        return res.status(400).json({ message: "Invalid task ID" });
+      }
+  
+      // Validate the status data
+      const validStatuses = ["Pending", "In Progress", "Completed"];
+      if (!status || !validStatuses.includes(status)) {
+        return res.status(400).json({ message: "Invalid status, valid values are: Pending, In Progress, Completed" });
+      }
+  
+      // Fetch the appointment by appointmentId
+      const appointment = await Appointment.findById(appointmentId);
+      if (!appointment) {
+        return res.status(404).json({ message: "Appointment not found" });
+      }
+  
+      // Find the task within the workload array
+      const taskIndex = appointment.workload.findIndex(task => task._id.toString() === taskId);
+      if (taskIndex === -1) {
+        return res.status(404).json({ message: "Task not found" });
+      }
+  
+      // Update the task status
+      appointment.workload[taskIndex].status = status;
+  
+      // Save the updated appointment
+      const updatedAppointment = await appointment.save();
+  
+      // Return the updated appointment
+      res.status(200).json({
+        message: "Workload step status updated successfully",
+        appointment: updatedAppointment,
+      });
+    } catch (error) {
+      console.error("Error updating workload status:", error);
+      res.status(500).json({ message: `Server error: ${error.message}` });
+    }
+  };
+  
+
 //chamod
 module.exports = {
-  createAppointment,
-  getUserAppointments,
-  getAppointments,
-  updateWorkload,
-  fetchApppintmetDetails,
-  getWorkload,
-  suggestionWrite,
-  getCount,
-  getAssigned,
-  getTechMessage,
+
+    createAppointment,
+    getUserAppointments,
+    getAppointments,
+    updateWorkload,
+    fetchApppintmetDetails,
+    getWorkload,
+    suggestionWrite,
+    getCount,
+    getAssigned,
+    getTechMessage,
+    upadateWorkloadStatus,
 };
+
