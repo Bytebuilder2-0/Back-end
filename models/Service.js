@@ -11,10 +11,7 @@ const serviceSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    description: {
-      type: String,
-      required: false,
-    },
+
     steps: [
       {
         step: { type: Number },
