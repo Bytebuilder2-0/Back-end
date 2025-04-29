@@ -86,7 +86,7 @@ const createAppointment = async (req, res) => {
       vehicleNumber: selectedVehicle.vehicleNumber,
       model: selectedVehicle.model,
       issue,
-      status: "Pending",
+      status: "Checking",
       services: selectedServices,
       preferredDate: preferDate,
       preferredTime,
