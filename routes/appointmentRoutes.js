@@ -8,7 +8,8 @@ const {
     getWorkload,
     fetchApppintmetDetails,
     getAssigned,
-    getCount
+    getCount,
+    upadateWorkloadStatus
 } = require("../controllers/appointmentController.js");
 const { authMiddleware } = require("../middlewares/userAuthMiddleware.js");
 const { getServices } = require("../controllers/serviceController");
@@ -48,5 +49,6 @@ router.put("/:appointmentId/statusUpdate", updateAppointmentStatus);
 router.put("/:appointmentId/tStatusUpdate", tStatusUpdate);
 router.put("/:appointmentId/tSuggestionWrite", tSuggestionWrite);
 router.put("/:appointmentId/suggestions", suggestionWrite);
+router.put("/:appointmentId/workload/:taskId", upadateWorkloadStatus);
 
 module.exports = router;
