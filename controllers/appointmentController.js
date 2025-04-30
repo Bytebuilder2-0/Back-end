@@ -312,6 +312,7 @@ const getTechMessage = (req, res) => {
         });
 };
 
+
 const upadateWorkloadStatus = async(req, res) => {
     try {
         const { appointmentId, taskId } = req.params;
@@ -375,3 +376,4 @@ module.exports = {
     getTechMessage,
     upadateWorkloadStatus,
 };
+
