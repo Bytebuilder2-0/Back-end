@@ -18,6 +18,8 @@ const authMiddleware = async (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded;
+    const userId = decoded.id; // This is the user._id you put into the token
+  console.log("User ID:", userId);
     next();
   } catch (err) {
     console.error("Token verification error:", err);
