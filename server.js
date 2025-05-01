@@ -13,6 +13,7 @@ const authRoutes = require("./routes/authRouter.js");
 const { authMiddleware } = require("./middlewares/userAuthMiddleware.js");
 const feedbackRoutes = require("./routes/feedbackRoutes");
 const service = require("./routes/serviceManageRoutes.js");
+const { addToBlacklist } = require("./utils/blacklist.js"); // Import the blacklist utility
 
 dotenv.config();
 connectDB();
@@ -24,9 +25,9 @@ app.use(cors());
 app.use(bodyParser.json());
 
 //Routes
-// app.use("/api/auth", authRoutes);
-// app.use(authMiddleware);
-//app.use("/api/helloworld", (req, res) => res.send("Hello World")) // Apply the auth middleware to all routes below this line
+app.use("/api/auth", authRoutes);
+app.use(authMiddleware);
+app.use("/api/helloworld", (req, res) => res.send("Hello World")) // Apply the auth middleware to all routes below this line
 app.use("/api/appointments", appointmentRoutes);
 app.use("/api/technicians", technicianRoutes);
 app.use("/api/budget", budgetRoutes);
