@@ -19,7 +19,8 @@ const { updateAppointmentStatus } = require("../controllers/statusUpdate.js");
 const { tStatusUpdate } = require("../controllers/TStatusUpdate.js");
 const { tSuggestionWrite } = require("../controllers/tSuggestionWrite.js");
 
-const { getTechMessage} = require("../controllers/appointmentController.js");
+const { getTechMessage } = require("../controllers/appointmentController.js");
+const { confirmAppointmentBySupervisor } = require("../controllers/selectiveApp.js");
 
 
 
@@ -50,5 +51,7 @@ router.put("/:appointmentId/tStatusUpdate", tStatusUpdate);
 router.put("/:appointmentId/tSuggestionWrite", tSuggestionWrite);
 router.put("/:appointmentId/suggestions", suggestionWrite);
 router.put("/:appointmentId/workload/:taskId", upadateWorkloadStatus);
+
+router.put("/:appointmentId/confirm-supervisor", confirmAppointmentBySupervisor);
 
 module.exports = router;
