@@ -2,6 +2,7 @@ const Auth = require('../models/auth.js');  // Import your model
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const validator = require('validator');
+const {addToBlacklist} = require('../utils/blacklist.js'); // Import the blacklist utility
 
 // User Registration with Role-based access
 const registerUser = async (req, res) => {
@@ -118,5 +119,16 @@ const loginUser = async (req, res) => {
       res.status(500).json({ message: "Internal Server Error" });
     } 
    };
+
+
+   const logoutUser = async (req, res) => {
+    const authHeader = req.header("Authorization");
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({ message: "Authorization token is missing" });
+    }
+    const token = authHeader.split(" ")[1];
+    addToBlacklist(token); // Add token to blacklist
+    res.status(200).json({ message: "Logout successful" });
+  };
   
- module.exports = { registerUser, loginUser };
+ module.exports = { registerUser, loginUser, logoutUser };
