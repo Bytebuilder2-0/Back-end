@@ -35,7 +35,7 @@ const appointmentSchema = new mongoose.Schema({
                 "Paid", //money paid by the customer
                 "All done" //submit feedback and appoitment process completed
             ],
-            default: "Pending",
+            default: "Checking",
         },
         workload: [{
             step: { type: Number, required: true },            // Numbering each task
