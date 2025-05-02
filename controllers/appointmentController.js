@@ -84,13 +84,13 @@ const createAppointment = async(req, res) => {
         await newAppointment.save();
 
         res.status(201).json({
-            message: "✅ Appointment and Budget created successfully",
+            message: "Appointment and Budget created successfully",
             appointment: newAppointment,
             budget: newBudget,
         });
     } catch (error) {
         console.error("Error creating appointment:", error);
-        console.error("🚨 Error:", error.message);
+        console.error("Error:", error.message);
         res.status(500).json({ error: error.message });
     }
 };
@@ -255,9 +255,9 @@ const suggestionWrite = async(req, res) => {
         appointment.suggestion = suggestion;
         await appointment.save();
 
-        res.json({ message: "✅ Suggestion updated successfully", appointment });
+        res.json({ message: "Suggestion updated successfully", appointment });
     } catch (error) {
-        console.error("🚨 Error:", error.message);
+        console.error("Error:", error.message);
         res.status(500).json({ error: error.message });
     }
 };
@@ -376,4 +376,3 @@ module.exports = {
     getTechMessage,
     upadateWorkloadStatus,
 };
-
