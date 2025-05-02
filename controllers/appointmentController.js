@@ -1,6 +1,7 @@
+const mongoose = require("mongoose");
+
 const Appointment = require("../models/Appointment.js");
 const User = require("../models/User");
-const mongoose = require("mongoose");
 const Vehicle = require("../models/Vehicle");
 const Service = require("../models/Service");
 const Budget = require("../models/Budget.js");
@@ -162,7 +163,7 @@ const getUserAppointments = async(req, res) => {
     }
 };
 
-// 2️ Get all appointments (Supervisor dashboarrd)
+// Get all appointments (Supervisor dashboarrd)
 const getAppointments = async(req, res) => {
     try {
         const appointments = await Appointment.find({},
@@ -176,7 +177,8 @@ const getAppointments = async(req, res) => {
 
 // 3️ Update workload for an appointment (Supervisor updates workload)
 const updateWorkload = async(req, res) => {
-    const { workload } = req.body; // Expecting an array of objects
+    // Expecting an array of objects
+    const { workload } = req.body;
     const { id } = req.params;
 
     if (!mongoose.isValidObjectId(id)) {
