@@ -5,10 +5,12 @@ const Vehicle = require("../models/Vehicle");
 const Service = require("../models/Service");
 const Budget = require("../models/Budget.js");
 
-// 1️ Create a new appointment (Client submits form)
+//  ----- Create a new appointment (Client submits form) -----
+
 const createAppointment = async (req, res) => {
   try {
-    const {
+  
+    const {                        //These are form fields sent by the client (frontend)
       vehicleObject,
       services,
       issue,
@@ -16,7 +18,7 @@ const createAppointment = async (req, res) => {
       preferredTime,
       expectedDeliveryDate,
       contactNumber,
-    } = req.body;
+    } = req.body;   
 
     if (
       !services ||
@@ -24,12 +26,15 @@ const createAppointment = async (req, res) => {
       !preferredDate ||
       !expectedDeliveryDate ||
       !contactNumber
-    ) {
+    ) {                                 
       return res.status(400).json({ message: "All fields are required......" });
     }
+
     const userId = req.params.user_id;
 
     const userVehicles = await Vehicle.find({ user: userId });
+
+    //validation
 
     const selectedVehicle = userVehicles.find(
       (vehicle) => vehicle._id.toString() === vehicleObject
@@ -64,6 +69,7 @@ const createAppointment = async (req, res) => {
 
     const preferDate = new Date(preferredDate);
     const deliveryDate = new Date(expectedDeliveryDate);
+
     if (deliveryDate <= new Date() && preferDate <= new Date()) {
       return res.status(400).json({ message: "Date must be in the future" });
     }
@@ -79,14 +85,14 @@ const createAppointment = async (req, res) => {
         .json({ message: "Invalid preferred time format (use HH:MM AM/PM)" });
     }
 
-    // Step 1: Create a new appointment
+    // Create a new appointment
     const newAppointment = new Appointment({
       userId,
       vehicleObject,
       vehicleNumber: selectedVehicle.vehicleNumber,
       model: selectedVehicle.model,
       issue,
-      status: "Pending",
+      status: "Checking",
       services: selectedServices,
       preferredDate: preferDate,
       preferredTime,
@@ -96,30 +102,85 @@ const createAppointment = async (req, res) => {
 
     await newAppointment.save();
 
-    // Step 2: Create a linked budget (only references appointmentId)
-    const newBudget = new Budget({
-      appointmentId: newAppointment._id, // Link to appointment
+    const newBudget = new Budget({             //Create a linked budget references for appointmentId
+      appointmentId: newAppointment._id, 
       amountAllocations: [],
       totalAmount: 0,
     });
 
     await newBudget.save();
 
-    // Step 3: (Optional) Link the budget in the appointment model if needed
-    newAppointment.budgetId = newBudget._id;
+    newAppointment.budgetId = newBudget._id;          //Link the budget in the appointment model 
     await newAppointment.save();
 
     res.status(201).json({
-      message: "✅ Appointment and Budget created successfully",
+      message: " Appointment and Budget created successfully",
       appointment: newAppointment,
       budget: newBudget,
     });
   } catch (error) {
-    console.error("Error creating appointment:", error);
-    console.error("🚨 Error:", error.message);
+    console.error("Error creating appointment:", error.message);
+
     res.status(500).json({ error: error.message });
   }
 };
+
+
+
+// ----- get all appointments related to user -----
+
+const getUserAppointments = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid user ID format",
+      });
+    }
+    const userObjectId = new mongoose.Types.ObjectId(userId);
+
+    const userExists = await User.exists({ _id: userObjectId });
+
+    if (!userExists) {                                   //User validation
+      console.log(`User ${userId} not found`);
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    const appointments = await Appointment.find({        // Find all appointments for the user
+      userId: userObjectId,
+    }).lean();
+
+  
+    if (appointments.length === 0) {
+      console.log(`No appointments found for user ${userId}`);
+    }
+
+    res.status(200).json({
+      success: true,
+      count: appointments.length,
+      data: appointments,
+    });
+
+  } catch (error) {
+    console.error("Error fetching user appointments:", error);
+    if (!res.headersSent) {
+      res.status(500).json({
+        success: false,
+        message: "Server error while fetching appointments",
+        error: error.message,
+      });
+    }
+  }
+};
+
+
+
+//---- Fetching all the appointments rekated to user----
 
 const fetchApppintmetDetails = async (req, res) => {
   try {
@@ -138,57 +199,10 @@ const fetchApppintmetDetails = async (req, res) => {
   }
 };
 
-//get all appointments related to user
 
-const getUserAppointments = async (req, res) => {
-  try {
-    const { userId } = req.params;
 
-    if (!mongoose.Types.ObjectId.isValid(userId)) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid user ID format",
-      });
-    }
-    const userObjectId = new mongoose.Types.ObjectId(userId);
+// --- Get all appointments (Supervisor dashboarrd) ----
 
-    const userExists = await User.exists({ _id: userObjectId });
-    if (!userExists) {
-      console.log(`User ${userId} not found`);
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
-    }
-    // Find all appointments for the user
-    const appointments = await Appointment.find({
-      userId: userObjectId,
-    }).lean();
-
-    console.log(`Found ${appointments.length} appointments for user ${userId}`);
-    console.log("Found appointments:", appointments);
-
-    if (appointments.length === 0) {
-      console.log(`[WARN] No appointments found for user ${userId}`);
-    }
-    res.status(200).json({
-      success: true,
-      count: appointments.length,
-      data: appointments,
-    });
-  } catch (error) {
-    console.error("Error fetching user appointments:", error);
-    if (!res.headersSent) {
-      res.status(500).json({
-        success: false,
-        message: "Server error while fetching appointments",
-        error: error.message,
-      });
-    }
-  }
-};
-
-// 2️ Get all appointments (Supervisor dashboarrd)
 const getAppointments = async (req, res) => {
   try {
     const appointments = await Appointment.find(
@@ -201,7 +215,8 @@ const getAppointments = async (req, res) => {
   }
 };
 
-// 3️ Update workload for an appointment (Supervisor updates workload)
+
+// ---- Update workload for an appointment (Supervisor updates workload) -----
 const updateWorkload = async (req, res) => {
   const { workload } = req.body; // Expecting an array of objects
   const { id } = req.params;
@@ -289,9 +304,9 @@ const suggestionWrite = async (req, res) => {
     appointment.suggestion = suggestion;
     await appointment.save();
 
-    res.json({ message: "✅ Suggestion updated successfully", appointment });
+    res.json({ message: "Suggestion updated successfully", appointment });
   } catch (error) {
-    console.error("🚨 Error:", error.message);
+    console.error("Error:", error.message);
     res.status(500).json({ error: error.message });
   }
 };

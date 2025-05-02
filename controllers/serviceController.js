@@ -1,24 +1,7 @@
 const Service = require("../models/Service");
 
-const setServices = async (req, res) => {
-  try {
-    const { name, description } = req.body;
 
-    const newService = new Service({
-      name,
-      description,
-    });
-
-    await newService.save();
-    res
-      .status(201)
-      .json({ message: "service created successfully", service: Service });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Internal Server Error", error: error.message });
-  }
-};
+// --- Get services for service drop down in form
 
 const getServices = async (req, res) => {
   try {
@@ -29,6 +12,10 @@ const getServices = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+
+//--- Add services  ----
+
 const addServices = async (req, res) => {
   try {
     const { name } = req.body; // Assuming we only send name
@@ -57,6 +44,8 @@ const addServices = async (req, res) => {
       .json({ message: "Internal Server Error", error: error.message });
   }
 };
+
+
 const viewServices = async (req, res) => {
   try {
     const services = await Service.find({}); // Fetch all services from the database
@@ -122,7 +111,6 @@ const updateServiceSteps = async (req, res) => {
 
 module.exports = {
   getServices,
-  setServices,
   addServices,
   viewServices,
   toggleService,
