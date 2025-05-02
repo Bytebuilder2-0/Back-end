@@ -9,7 +9,7 @@ const {
     fetchApppintmetDetails,
     getAssigned,
     getCount,
-    upadateWorkloadStatus
+    upadateWorkloadStatus,
 } = require("../controllers/appointmentController.js");
 const { authMiddleware } = require("../middlewares/userAuthMiddleware.js");
 const { getServices } = require("../controllers/serviceController");
@@ -20,9 +20,7 @@ const { tStatusUpdate } = require("../controllers/TStatusUpdate.js");
 const { tSuggestionWrite } = require("../controllers/tSuggestionWrite.js");
 
 const { getTechMessage } = require("../controllers/appointmentController.js");
-const { confirmAppointmentBySupervisor } = require("../controllers/selectiveApp.js");
-
-
+const { setReason } = require("../controllers/reasonSet.js");
 
 const router = express.Router();
 
@@ -33,7 +31,6 @@ router.get("/user/:userId", getUserAppointments);
 router.get("/services", getServices);
 router.get("/:appointment_id", fetchApppintmetDetails); //Fetch detail of a specific appointment
 
-
 router.get("/vehicles/:user_id", getUserVehicles);
 
 router.get("/", getAppointments); //fetch all appointments to supervisor dashboard
@@ -43,7 +40,6 @@ router.get("/:id/techMessage", getTechMessage);
 //me
 router.get("/completed", getAssigned);
 
-
 router.put("/:appointmentId/assign2", assignTechnician);
 
 router.put("/:appointmentId/statusUpdate", updateAppointmentStatus);
@@ -52,6 +48,6 @@ router.put("/:appointmentId/tSuggestionWrite", tSuggestionWrite);
 router.put("/:appointmentId/suggestions", suggestionWrite);
 router.put("/:appointmentId/workload/:taskId", upadateWorkloadStatus);
 
-router.put("/:appointmentId/confirm-supervisor", confirmAppointmentBySupervisor);
+router.put("/:app_id/reason", setReason);
 
 module.exports = router;
