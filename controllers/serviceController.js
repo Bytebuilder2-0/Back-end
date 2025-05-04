@@ -1,7 +1,7 @@
 const Service = require("../models/Service");
 
 
-// --- Get services for service drop down in form
+// --- Get services -----
 
 const getServices = async (req, res) => {
   try {

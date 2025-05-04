@@ -18,7 +18,7 @@ const appointmentSchema = new mongoose.Schema({
         vehicleNumber: { type: String, required: true },
         model: { type: String, required: true },
         issue: { type: String, required: true },
-        reason: { type: String, default: null}, //meeeeeeeee
+        reason: { type: String, default: null}, 
         status: {
             type: String,
             enum: [

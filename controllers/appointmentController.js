@@ -180,7 +180,7 @@ const getUserAppointments = async (req, res) => {
 
 
 
-//---- Fetching all the appointments rekated to user----
+//---- Fetching all the appointments ----
 
 const fetchApppintmetDetails = async (req, res) => {
   try {
