@@ -247,27 +247,7 @@ const getUserAppointments = async(req, res) => {
             });
         }
     }
-  
-    if (appointments.length === 0) {
-      console.log(`No appointments found for user ${userId}`);
-    }
-
-    res.status(200).json({
-      success: true,
-      count: appointments.length,
-      data: appointments,
-    });
-
-  } catch (error) {
-    console.error("Error fetching user appointments:", error);
-    if (!res.headersSent) {
-      res.status(500).json({
-        success: false,
-        message: "Server error while fetching appointments",
-        error: error.message,
-      });
-    }
-  }
+  } 
 };
 
 // Get all appointments (Supervisor dashboarrd)
@@ -280,7 +260,7 @@ const getAppointments = async(req, res) => {
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
-
+}
 
 //---- Fetching all the appointments ----
 
@@ -316,12 +296,6 @@ const getAppointments = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
-// 3️ Update workload for an appointment (Supervisor updates workload)
-const updateWorkload = async(req, res) => {
-    // Expecting an array of objects
-    const { workload } = req.body;
-    const { id } = req.params;
 
 // ---- Update workload for an appointment (Supervisor updates workload) -----
 const updateWorkload = async (req, res) => {
@@ -409,12 +383,9 @@ const suggestionWrite = async(req, res) => {
         console.error("Error:", error.message);
         res.status(500).json({ error: error.message });
     }
-    res.json({ message: "Suggestion updated successfully", appointment });
-  } catch (error) {
-    console.error("Error:", error.message);
-    res.status(500).json({ error: error.message });
-  }
-};
+  
+  };
+
 
 const getWorkload = (req, res) => {
     const appointmentId = req.params.id;
