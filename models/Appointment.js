@@ -30,10 +30,10 @@ const appointmentSchema = new mongoose.Schema({
                 "Waiting for Technician Confirmation", //tech confirmation waiting
                 "Accepted", //tech accepted
                 "Reject2", //tech rejected
-                "InProgress", //task is started 
+                "InProgress", //task is started
                 "Task Done", //task completed by tech
                 "Paid", //money paid by the customer
-                "All done" //submit feedback and appoitment process completed
+                "All done", //submit feedback and appoitment process completed
             ],
             default: "Checking",
         },
@@ -53,7 +53,7 @@ const appointmentSchema = new mongoose.Schema({
         preferredDate: { type: Date, required: true },
         preferredTime: { type: String, required: true },
         expectedDeliveryDate: { type: Date, required: true },
-        
+
         tech: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Technician", //model name not the collection name
@@ -73,7 +73,11 @@ const appointmentSchema = new mongoose.Schema({
             enum: ["Pending", "Paid"],
             default: "Pending",
         },
-
+        sconfirmedBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "auth", // Reference to the registered user
+            required: false,
+        }
     }, { timestamps: true } // Auto-adds createdAt & updatedAt
 );
 
