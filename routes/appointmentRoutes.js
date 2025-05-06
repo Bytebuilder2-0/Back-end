@@ -1,15 +1,15 @@
 const express = require("express");
 const {
-	createAppointment,
-	getAppointments,
-	getUserAppointments,
-	updateWorkload,
-	suggestionWrite,
-	getWorkload,
-	fetchApppintmetDetails,
-	getAssigned,
-	getCount,
-	upadateWorkloadStatus,
+    createAppointment,
+    getAppointments,
+    getUserAppointments,
+    updateWorkload,
+    suggestionWrite,
+    getWorkload,
+    fetchApppintmetDetails,
+    getAssigned,
+    getCount,
+    upadateWorkloadStatus,
 } = require("../controllers/appointmentController.js");
 
 const { getServices } = require("../controllers/serviceController");
@@ -21,11 +21,14 @@ const { tSuggestionWrite } = require("../controllers/tSuggestionWrite.js");
 const { getTechMessage } = require("../controllers/appointmentController.js");
 const { setReason } = require("../controllers/reasonSet.js");
 
+const userAuthMiddleware = require("../middlewares/userAuthMiddleware.js");
+const { authorizeRoles } = require("../middlewares/authorizeRoles.js");
+
 const router = express.Router();
 
 router.post("/:user_id", createAppointment);
 
-router.get("/statusCounts", getCount);
+router.get("/statusCounts", authorizeRoles("Supervisor"), getCount);
 router.get("/user/:userId", getUserAppointments);
 router.get("/services", getServices);
 router.get("/:appointment_id", fetchApppintmetDetails);
