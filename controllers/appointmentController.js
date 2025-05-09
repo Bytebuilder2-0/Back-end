@@ -167,7 +167,7 @@ const getUserAppointments = async(req, res) => {
 const getAppointments = async(req, res) => {
     try {
         const appointments = await Appointment.find({},
-            "vehicleId vehicleNumber model issue reason workload tech status techMessage contactNumber payment appointmentId suggestion expectedDeliveryDate"
+            "vehicleId vehicleNumber model issue reason workload tech status techMessage contactNumber payment appointmentId suggestion expectedDeliveryDate sconfirmedBy"
         ).populate("tech", "employee_id technician_id");
         res.json(appointments);
     } catch (error) {

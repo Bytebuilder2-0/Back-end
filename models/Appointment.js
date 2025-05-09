@@ -76,6 +76,7 @@ const appointmentSchema = new mongoose.Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: "auth", // Reference to the registered user
             required: false,
+            default: null,
         }
     }, { timestamps: true } // Auto-adds createdAt & updatedAt
 );
