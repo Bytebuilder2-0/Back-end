@@ -29,7 +29,7 @@ const router = express.Router();
 
 router.post("/:user_id", createAppointment);
 
-router.get("/statusCounts", authorizeRoles("Supervisor"), getCount);
+router.get("/statusCounts", authorizeRoles("supervisor"), getCount);
 router.get("/user/:userId", getUserAppointments);
 router.get("/services", getServices);
 router.get("/:appointment_id", fetchApppintmetDetails);
