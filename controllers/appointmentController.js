@@ -6,16 +6,12 @@ const Vehicle = require("../models/Vehicle");
 const Service = require("../models/Service");
 const Budget = require("../models/Budget.js");
 
-// 1️ Create a new appointment (Client submits form)
-const createAppointment = async(req, res) => {
-    try {
-        const { vehicleObject, services, issue, preferredDate, preferredTime, expectedDeliveryDate, contactNumber } =
-        req.body;
+
 //  ----- Create a new appointment (Client submits form) -----
 
 const createAppointment = async (req, res) => {
+
   try {
-  
     const {                        //These are form fields sent by the client (frontend)
       vehicleObject,
       services,
@@ -26,30 +22,19 @@ const createAppointment = async (req, res) => {
       contactNumber,
     } = req.body;   
 
-        if (!services || !issue || !preferredDate || !expectedDeliveryDate || !contactNumber) {
-            return res.status(400).json({ message: "All fields are required......" });
-        }
-        const userId = req.params.user_id;
-    if (
-      !services ||
-      !issue ||
-      !preferredDate ||
-      !expectedDeliveryDate ||
-      !contactNumber
-    ) {                                 
-      return res.status(400).json({ message: "All fields are required......" });
-    }
-
+  if (!services || !issue || !preferredDate || !expectedDeliveryDate || !contactNumber) {
+     return res.status(400).json({ message: "All fields are required......" });
+         }
+         
     const userId = req.params.user_id;
 
-        const userVehicles = await Vehicle.find({ user: userId });
     const userVehicles = await Vehicle.find({ user: userId });
 
     //validation
 
-        const selectedVehicle = userVehicles.find((vehicle) => vehicle._id.toString() === vehicleObject);
+    const selectedVehicle = userVehicles.find((vehicle) => vehicle._id.toString() === vehicleObject);
 
-        if (!selectedVehicle) {
+    if (!selectedVehicle) {
             return res.status(400).json({ message: "Invalid vehicle selected" });
         }
 
@@ -69,14 +54,7 @@ const createAppointment = async (req, res) => {
             });
         }
 
-        const preferDate = new Date(preferredDate);
-        const deliveryDate = new Date(expectedDeliveryDate);
-        if (deliveryDate <= new Date() && preferDate <= new Date()) {
-            return res.status(400).json({ message: "Date must be in the future" });
-        }
-        if (deliveryDate < preferDate) {
-            return res.status(400).json({ message: "Delivery date must be future than prefered date " });
-        }
+
     const preferDate = new Date(preferredDate);
     const deliveryDate = new Date(expectedDeliveryDate);
 
@@ -93,20 +71,7 @@ const createAppointment = async (req, res) => {
             return res.status(400).json({ message: "Invalid preferred time format (use HH:MM AM/PM)" });
         }
 
-        // Step 1: Create a new appointment
-        const newAppointment = new Appointment({
-            userId,
-            vehicleObject,
-            vehicleNumber: selectedVehicle.vehicleNumber,
-            model: selectedVehicle.model,
-            issue,
-            status: "Checking",
-            services: selectedServices,
-            preferredDate: preferDate,
-            preferredTime,
-            expectedDeliveryDate: deliveryDate,
-            contactNumber,
-        });
+   
     // Create a new appointment
     const newAppointment = new Appointment({
       userId,
@@ -122,27 +87,15 @@ const createAppointment = async (req, res) => {
       contactNumber,
     });
 
-        await newAppointment.save();
+    await newAppointment.save();
 
-        // Step 2: Create a linked budget (only references appointmentId)
-        const newBudget = new Budget({
-            appointmentId: newAppointment._id, // Link to appointment
-            amountAllocations: [],
-            totalAmount: 0,
-        });
     const newBudget = new Budget({             //Create a linked budget references for appointmentId
       appointmentId: newAppointment._id, 
       amountAllocations: [],
       totalAmount: 0,
     });
 
-        await newBudget.save();
-
-        // Step 3: (Optional) Link the budget in the appointment model if needed
-        newAppointment.budgetId = newBudget._id;
-        await newAppointment.save();
     newAppointment.budgetId = newBudget._id;          //Link the budget in the appointment model 
-    await newAppointment.save();
 
         res.status(201).json({
             message: "Appointment and Budget created successfully",
@@ -154,16 +107,6 @@ const createAppointment = async (req, res) => {
         console.error("Error:", error.message);
         res.status(500).json({ error: error.message });
     }
-    res.status(201).json({
-      message: " Appointment and Budget created successfully",
-      appointment: newAppointment,
-      budget: newBudget,
-    });
-  } catch (error) {
-    console.error("Error creating appointment:", error.message);
-
-    res.status(500).json({ error: error.message });
-  }
 };
 
 const fetchApppintmetDetails = async(req, res) => {
@@ -183,8 +126,6 @@ const fetchApppintmetDetails = async(req, res) => {
     }
 };
 
-//get all appointments related to user
-
 
 // ----- get all appointments related to user -----
 
@@ -201,18 +142,6 @@ const getUserAppointments = async(req, res) => {
         const userObjectId = new mongoose.Types.ObjectId(userId);
 
         const userExists = await User.exists({ _id: userObjectId });
-        if (!userExists) {
-            console.log(`User ${userId} not found`);
-            return res.status(404).json({
-                success: false,
-                message: "User not found",
-            });
-        }
-        // Find all appointments for the user
-        const appointments = await Appointment.find({
-            userId: userObjectId,
-        }).lean();
-    const userExists = await User.exists({ _id: userObjectId });
 
     if (!userExists) {                                   //User validation
       console.log(`User ${userId} not found`);
@@ -226,8 +155,8 @@ const getUserAppointments = async(req, res) => {
       userId: userObjectId,
     }).lean();
 
-        console.log(`Found ${appointments.length} appointments for user ${userId}`);
-        console.log("Found appointments:", appointments);
+      console.log(`Found ${appointments.length} appointments for user ${userId}`);
+      console.log("Found appointments:", appointments);
 
         if (appointments.length === 0) {
             console.log(`[WARN] No appointments found for user ${userId}`);
@@ -247,24 +176,11 @@ const getUserAppointments = async(req, res) => {
             });
         }
     }
-  } 
-};
-
-// Get all appointments (Supervisor dashboarrd)
-const getAppointments = async(req, res) => {
-    try {
-        const appointments = await Appointment.find({},
-            "vehicleId vehicleNumber model issue reason workload tech status techMessage contactNumber payment appointmentId suggestion expectedDeliveryDate"
-        ).populate("tech", "employee_id technician_id");
-        res.json(appointments);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-}
+  };
 
 //---- Fetching all the appointments ----
 
-const fetchApppintmetDetails = async (req, res) => {
+const fetchAppointmentDetails = async (req, res) => {
   try {
     const appointmentId = req.params.appointment_id;
 
@@ -298,6 +214,7 @@ const getAppointments = async (req, res) => {
 };
 
 // ---- Update workload for an appointment (Supervisor updates workload) -----
+
 const updateWorkload = async (req, res) => {
   const { workload } = req.body; // Expecting an array of objects
   const { id } = req.params;
@@ -493,11 +410,11 @@ module.exports = {
     getUserAppointments,
     getAppointments,
     updateWorkload,
-    fetchApppintmetDetails,
+    fetchAppointmentDetails,
     getWorkload,
     suggestionWrite,
     getCount,
     getAssigned,
     getTechMessage,
-    upadateWorkloadStatus,
+    upadateWorkloadStatus
 };

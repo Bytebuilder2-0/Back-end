@@ -42,7 +42,7 @@ const appointmentSchema = new mongoose.Schema({
             description: { type: String, required: true },     // Task details
             status: {
                 type: String,
-                enum: ["Pending", "In Progress", "Completed"],
+                enum: ["Pending", "Completed"],
                 default: "Pending",
             }, // Optional
         }, ],
