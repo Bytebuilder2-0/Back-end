@@ -26,8 +26,8 @@ app.use(cors());
 app.use(bodyParser.json());
 
 //Routes
-// app.use("/api/auth", authRoutes);
-// app.use(authMiddleware);
+app.use("/api/auth", authRoutes);
+app.use(authMiddleware);
 
 app.use("/api/appointments", appointmentRoutes);
 app.use("/api/technicians", technicianRoutes);

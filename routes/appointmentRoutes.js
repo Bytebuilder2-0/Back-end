@@ -20,6 +20,10 @@ const { tStatusUpdate } = require("../controllers/TStatusUpdate.js");
 const { tSuggestionWrite } = require("../controllers/tSuggestionWrite.js");
 const { getTechMessage } = require("../controllers/appointmentController.js");
 const { setReason } = require("../controllers/reasonSet.js");
+const { supervisedBy } = require("../controllers/supervisedBy.js");
+
+const userAuthMiddleware = require("../middlewares/userAuthMiddleware.js");
+const { authorizeRoles } = require("../middlewares/authorizeRoles.js");
 
 const router = express.Router();
 
@@ -49,5 +53,6 @@ router.put("/:appointmentId/tSuggestionWrite", tSuggestionWrite);
 router.put("/:appointmentId/suggestions", suggestionWrite);
 router.put("/:appointmentId/workload/:taskId", upadateWorkloadStatus);
 router.put("/:app_id/reason", setReason);
+router.put("/:appointmentId/superby", supervisedBy);
 
 module.exports = router;
