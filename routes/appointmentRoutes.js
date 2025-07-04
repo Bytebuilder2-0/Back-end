@@ -1,15 +1,18 @@
 const express = require("express");
 const {
-    createAppointment,
-    getAppointments,
-    getUserAppointments,
-    updateWorkload,
-    suggestionWrite,
-    getWorkload,
-    fetchApppintmetDetails,
-    getAssigned,
-    getCount,
-    upadateWorkloadStatus,
+  createAppointment,
+  getAppointments,
+  getUserAppointments,
+  updateWorkload,
+  suggestionWrite,
+  getWorkload,
+  fetchApppintmetDetails,
+  getAssigned,
+  getCount,
+  getCountAnalyse,
+  upadateWorkloadStatus,
+  getTechnicianAppointmentCount,
+  getDepartmentStatusData,
 } = require("../controllers/appointmentController.js");
 
 const { getServices } = require("../controllers/serviceController");
@@ -30,6 +33,9 @@ const router = express.Router();
 router.post("/:user_id", createAppointment);
 
 router.get("/statusCounts", authorizeRoles("supervisor"), getCount);
+router.get("/statusCountsc", getCountAnalyse);
+router.get("/statusCountscheck", getTechnicianAppointmentCount);
+router.get("/departmentStatusData", getDepartmentStatusData);
 router.get("/user/:userId", getUserAppointments);
 router.get("/services", getServices);
 router.get("/:appointment_id", fetchApppintmetDetails);
