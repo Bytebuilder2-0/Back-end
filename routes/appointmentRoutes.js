@@ -1,18 +1,18 @@
 const express = require("express");
 const {
-  createAppointment,
-  getAppointments,
-  getUserAppointments,
-  updateWorkload,
-  suggestionWrite,
-  getWorkload,
-  fetchApppintmetDetails,
-  getAssigned,
-  getCount,
-  getCountAnalyse,
-  upadateWorkloadStatus,
-  getTechnicianAppointmentCount,
-  getDepartmentStatusData,
+    createAppointment,
+    getAppointments,
+    getUserAppointments,
+    updateWorkload,
+    suggestionWrite,
+    getWorkload,
+    fetchApppintmetDetails,
+    getAssigned,
+    getCount,
+    getCountAnalyse,
+    upadateWorkloadStatus,
+    getTechnicianAppointmentCount,
+    getDepartmentStatusData,
 } = require("../controllers/appointmentController.js");
 
 const { getServices } = require("../controllers/serviceController");
