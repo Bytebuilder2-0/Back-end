@@ -1,4 +1,4 @@
-const Auth = require('../models/auth.js'); // Import your model
+const Auth = require('../models/auth.js');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const validator = require('validator');
@@ -36,16 +36,16 @@ const registerUser = async(req, res) => {
             return res.status(400).json({ message: 'Email is already registered' });
         }
 
-        // Hash Password
+        // Hash Password 
         const hashedPassword = await bcrypt.hash(password, 10);
-
-        // Create New User
+ 
+        // Create New User instance
         const newUser = new Auth({
-            email,
-            fullName,
-            userName,
-            phone,
-            password: hashedPassword,
+            email, 
+            fullName, 
+            userName, 
+            phone, 
+            password: hashedPassword, 
             role,
         });
 
@@ -64,22 +64,21 @@ const registerUser = async(req, res) => {
 };
 
 
-// User Login function
+
 const loginUser = async(req, res) => {
     try {
-        const { email, password } = req.body;
-
-        //---------------------------------------------------------------------------------------
-        if (!email || !password) {
+        const { email, password } = req.body; 
+       
+        if (!email || !password) { 
             return res.status(400).json({ message: "All fields are required" });
-        }
+        } 
 
         // Check if user exists
         const user = await Auth.findOne({ email });
 
         if (!user) {
             return res.status(404).json({ message: "User not found. Please register." });
-        }
+        } 
 
         // Check if user is disabled
         if (user.isDisabled) {
@@ -93,29 +92,29 @@ const loginUser = async(req, res) => {
             return res.status(400).json({ message: "Invalid email or password" });
         }
 
-        // Generate JWT Token
-        const token = jwt.sign({
-                id: user._id,
-                role: user.role,
+        
+        const token = jwt.sign({ 
+                id: user._id,  
+                role: user.role, 
             },
-            process.env.JWT_SECRET, { expiresIn: "1d" }
+            process.env.JWT_SECRET, { expiresIn: "1d" } 
         );
 
         // Send response with role-based success message
-        res.status(200).json({
-            message: `Login successful as ${user.role}`,
-            token,
-            user: {
-                id: user._id,
-                fullName: user.fullName,
-                userName: user.userName,
-                role: user.role,
-            }
+        res.status(200).json({ 
+            message: `Login successful as ${user.role}`, 
+            token, 
+            user: { 
+                id: user._id, 
+                fullName: user.fullName, 
+                userName: user.userName, 
+                role: user.role, 
+            } 
         });
 
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Internal Server Error" });
+    } catch (error) { 
+        console.error(error); 
+        res.status(500).json({ message: "Internal Server Error" }); 
     }
 };
 
@@ -126,8 +125,8 @@ const logoutUser = async(req, res) => {
         return res.status(401).json({ message: "Authorization token is missing" });
     }
     const token = authHeader.split(" ")[1];
-    addToBlacklist(token); // Add token to blacklist
-    res.status(200).json({ message: "Logout successful" });
-};
-
-module.exports = { registerUser, loginUser, logoutUser };
+    addToBlacklist(token); // Add token to blacklist 
+    res.status(200).json({ message: "Logout successful" });  
+}; 
+ 
+module.exports = { registerUser, loginUser, logoutUser }; 
