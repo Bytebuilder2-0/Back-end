@@ -40,7 +40,7 @@ router.get("/statusCountscheck", getTechnicianAppointmentCount);
 router.get("/departmentStatusData", getDepartmentStatusData);
 router.get("/user/:userId", getUserAppointments);
 router.get("/services", getServices);
-router.get("/:appointment_id", fetchAppointmentDetails); //Fetch detail of a specific appointment
+router.get("/:appointment_id", fetchApppintmetDetails); //Fetch detail of a specific appointment
 
 
 router.get("/vehicles/:user_id", getUserVehicles);
