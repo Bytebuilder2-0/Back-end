@@ -97,6 +97,14 @@ const createAppointment = async (req, res) => {
 
     await newAppointment.save();
 
+    // Create feedback
+    const newFeedback = new Feedback({
+      appointmentId: newAppointment._id,
+    });
+
+    await newFeedback.save();
+    newAppointment.feedbackId = newFeedback._id;
+
     // Step 2: Create a linked budget (only references appointmentId)
     const newBudget = new Budget({
       appointmentId: newAppointment._id, // Link to appointment
@@ -111,9 +119,10 @@ const createAppointment = async (req, res) => {
     await newAppointment.save();
 
     res.status(201).json({
-      message: "Appointment and Budget created successfully",
+      message: "Appointment,Budget and FeedBack created successfully",
       appointment: newAppointment,
       budget: newBudget,
+      feedback: newFeedback,
     });
   } catch (error) {
     console.error("Error creating appointment:", error);
