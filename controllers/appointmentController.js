@@ -5,6 +5,7 @@ const User = require("../models/User");
 const Vehicle = require("../models/Vehicle");
 const Service = require("../models/Service");
 const Budget = require("../models/Budget.js");
+const Feedback = require("../models/Feedback");
 
 // 1️ Create a new appointment (Client submits form)
 const createAppointment = async (req, res) => {
