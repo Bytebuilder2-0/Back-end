@@ -1,6 +1,48 @@
 const mongoose = require("mongoose");
 const Vehicle = require("../models/Vehicle");
 
+const addVehicle = async(req,res) => {
+
+    try{
+
+    const {vehicleNumber,vehicleYear, model, vehicleType } = req.body;
+
+    if( !vehicleNumber|| !model|| !vehicleType || !vehicleYear){
+        return res.status(400).json({ message: "All fields are required......" });
+      }
+
+    const currentYear = new Date().getFullYear();
+
+    if (vehicleYear > currentYear) {
+      return res.status(400).json({
+        success: false,
+        message: `Year must be ${currentYear} or earlier`
+      });
+    }
+    const userId = req.params.user_id;
+
+    const vehicle = new Vehicle({
+      user: userId,
+      vehicleNumber,
+      vehicleYear,
+      model,
+      vehicleType
+    });
+
+    await vehicle.save();
+    res.status(201).json({
+      success: true,
+      data: vehicle
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Server Error'
+    });
+  }
+};
+
+
 const getUserVehicles = async (req, res) => {
     try {
         const userId = req.params.user_id; 
@@ -34,4 +76,6 @@ const getUserVehicles = async (req, res) => {
     }
 };
 
-module.exports = { getUserVehicles };
+
+
+module.exports = { getUserVehicles,addVehicle };

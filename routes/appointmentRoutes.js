@@ -16,7 +16,7 @@ const {
 } = require("../controllers/appointmentController.js");
 
 const { getServices } = require("../controllers/serviceController");
-const { getUserVehicles } = require("../controllers/vehicleController");
+const { getUserVehicles,addVehicle } = require("../controllers/vehicleController");
 const { assignTechnician } = require("../controllers/assignTechnician.js");
 const { updateAppointmentStatus } = require("../controllers/statusUpdate.js");
 const { tStatusUpdate } = require("../controllers/TStatusUpdate.js");
@@ -43,6 +43,7 @@ router.get("/services", getServices);
 router.get("/:appointment_id", fetchApppintmetDetails); //Fetch detail of a specific appointment
 
 
+router.post("/vehicles/:user_id",addVehicle);
 router.get("/vehicles/:user_id", getUserVehicles);
 
 router.get("/", getAppointments); //fetch all appointments to supervisor dashboard
