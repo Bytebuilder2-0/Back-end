@@ -1,5 +1,6 @@
 const Auth = require("../models/auth.js"); // Import your model
 const Technician = require("../models/Technician.js");
+const User = require("../models/User.js");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const validator = require("validator");
