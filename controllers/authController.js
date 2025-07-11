@@ -24,7 +24,7 @@ const registerUser = async(req, res) => {
 
 
         // Validate role
-        const allowedRoles = ['customer', 'technician', 'manager', 'Supervisor'];
+        const allowedRoles = ['customer', 'technician', 'manager', 'supervisor'];
         if (!allowedRoles.includes(role)) {
             return res.status(400).json({ message: 'Invalid Role Provided' });
         }
