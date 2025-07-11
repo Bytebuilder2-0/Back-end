@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const AutoIncrement = require("mongoose-sequence")(mongoose);
 
 const appointmentSchema = new mongoose.Schema(
   {
@@ -8,17 +9,16 @@ const appointmentSchema = new mongoose.Schema(
       required: true,
     },
 
-    vehicleId: { type: String, default: "1234" },
     vehicleObject: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Vehicle", // Reference to the Vehicle model
       required: true,
     },
-    appointmentId: { type: String, default: "123D" },
+    vehicleId: { type: Number, unique: true },
     vehicleNumber: { type: String, required: true },
     model: { type: String, required: true },
     issue: { type: String, required: true },
-    reason: { type: String, default: null }, //meeeeeeeee
+    reason: { type: String, default: null },
     status: {
       type: String,
       enum: [
@@ -43,7 +43,7 @@ const appointmentSchema = new mongoose.Schema(
         description: { type: String, required: true }, // Task details
         status: {
           type: String,
-          enum: ["Pending", "In Progress", "Completed"],
+          enum: ["Pending", "Completed"],
           default: "Pending",
         }, // Optional
       },
@@ -92,6 +92,8 @@ const appointmentSchema = new mongoose.Schema(
   },
   { timestamps: true } // Auto-adds createdAt & updatedAt
 );
+
+appointmentSchema.plugin(AutoIncrement, { inc_field: "vehicleId" });
 
 const Appointment = mongoose.model("Appointment", appointmentSchema);
 module.exports = Appointment;
