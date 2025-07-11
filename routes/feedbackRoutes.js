@@ -2,6 +2,7 @@ const express = require("express");
 const {
   getFeedbacks,
   addReply,
+  submitFeedback,
   updateActionStatus,
   deleteFeedback,
 } = require("../controllers/feedbackController");
@@ -9,6 +10,7 @@ const {
 
 const router = express.Router();
 
+router.post("/submit", submitFeedback);
 router.get("/", getFeedbacks);
 router.put("/:id/reply", addReply);
 router.put("/:id/action", updateActionStatus);

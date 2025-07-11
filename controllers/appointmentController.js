@@ -5,6 +5,7 @@ const User = require("../models/User");
 const Vehicle = require("../models/Vehicle");
 const Service = require("../models/Service");
 const Budget = require("../models/Budget.js");
+const Feedback = require("../models/Feedback");
 
 // 1️ Create a new appointment (Client submits form)
 const createAppointment = async (req, res) => {
@@ -97,6 +98,14 @@ const createAppointment = async (req, res) => {
 
     await newAppointment.save();
 
+    // Create feedback
+    const newFeedback = new Feedback({
+      appointmentId: newAppointment._id,
+    });
+
+    await newFeedback.save();
+    newAppointment.feedbackId = newFeedback._id;
+
     // Step 2: Create a linked budget (only references appointmentId)
     const newBudget = new Budget({
       appointmentId: newAppointment._id, // Link to appointment
@@ -111,9 +120,10 @@ const createAppointment = async (req, res) => {
     await newAppointment.save();
 
     res.status(201).json({
-      message: "Appointment and Budget created successfully",
+      message: "Appointment,Budget and FeedBack created successfully",
       appointment: newAppointment,
       budget: newBudget,
+      feedback: newFeedback,
     });
   } catch (error) {
     console.error("Error creating appointment:", error);
@@ -138,7 +148,6 @@ const fetchApppintmetDetails = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
 
 // ----- get all appointments related to user -----
 
