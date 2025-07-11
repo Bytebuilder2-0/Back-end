@@ -16,7 +16,7 @@ const {
 } = require("../controllers/appointmentController.js");
 
 const { getServices } = require("../controllers/serviceController");
-const { getUserVehicles } = require("../controllers/vehicleController");
+const { getUserVehicles,addVehicle } = require("../controllers/vehicleController");
 const { assignTechnician } = require("../controllers/assignTechnician.js");
 const { updateAppointmentStatus } = require("../controllers/statusUpdate.js");
 const { tStatusUpdate } = require("../controllers/TStatusUpdate.js");
@@ -30,6 +30,8 @@ const { authorizeRoles } = require("../middlewares/authorizeRoles.js");
 
 const router = express.Router();
 
+router.get("/statusCounts", getCount);
+
 router.post("/:user_id", createAppointment);
 
 router.get("/statusCounts", authorizeRoles("supervisor"), getCount);
@@ -38,16 +40,22 @@ router.get("/statusCountscheck", getTechnicianAppointmentCount);
 router.get("/departmentStatusData", getDepartmentStatusData);
 router.get("/user/:userId", getUserAppointments);
 router.get("/services", getServices);
-router.get("/:appointment_id", fetchApppintmetDetails);
+router.get("/:appointment_id", fetchApppintmetDetails); //Fetch detail of a specific appointment
+
+
+router.post("/vehicles/:user_id",addVehicle);
 router.get("/vehicles/:user_id", getUserVehicles);
-//fetch all appointments to supervisor dashboard
-router.get("/", getAppointments);
+
+router.get("/", getAppointments); //fetch all appointments to supervisor dashboard
+router.put("/:id/workload", updateWorkload);
 router.get("/:id/workload", getWorkload);
 router.get("/:id/techMessage", getTechMessage);
+//me
 router.get("/completed", getAssigned);
 
 router.put("/:id/workload", updateWorkload);
 router.put("/:appointmentId/assign2", assignTechnician);
+
 router.put("/:appointmentId/statusUpdate", updateAppointmentStatus);
 router.put("/:appointmentId/tStatusUpdate", tStatusUpdate);
 router.put("/:appointmentId/tSuggestionWrite", tSuggestionWrite);

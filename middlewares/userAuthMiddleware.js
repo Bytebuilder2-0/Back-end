@@ -1,6 +1,7 @@
 // middleware/authMiddleware.js
 const jwt = require("jsonwebtoken");
 const { isBlacklisted, addToBlacklist } = require("../utils/blacklist.js");
+const User = require("../models/auth.js");
 
 const authMiddleware = async (req, res, next) => {
   const authHeader = req.header("Authorization");
