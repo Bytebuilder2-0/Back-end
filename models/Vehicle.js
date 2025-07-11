@@ -6,6 +6,7 @@ const VehicleSchema = new mongoose.Schema({
      required: true }, // Reference to User
 
   vehicleNumber: { type: String, required: true },
+  vehicleYear: {type: Number, required: true},
   model: { type: String, required: true },
   vehicleType: { type: String, required: true },
 },
