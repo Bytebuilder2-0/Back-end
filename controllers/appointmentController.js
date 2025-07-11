@@ -149,7 +149,6 @@ const fetchApppintmetDetails = async (req, res) => {
   }
 };
 
-
 // ----- get all appointments related to user -----
 
 const getUserAppointments = async (req, res) => {
