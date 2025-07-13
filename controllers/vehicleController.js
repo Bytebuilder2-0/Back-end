@@ -75,7 +75,45 @@ const getUserVehicles = async (req, res) => {
         res.status(500).json({ error: "Server error" });
     }
 };
+//user can delete a vehicle
+const deleteVehicle = async (req, res) => {
+  try {
+    const userId = req.params.user_id;
+    const vehicleId = req.params.vehicle_id;
+
+    const vehicle = await Vehicle.findOneAndDelete({
+      _id: vehicleId,
+      user: userId,
+    });
+
+    if (!vehicle) {
+      return res.status(404).json({ message: "Vehicle not found or not authorized" });
+    }
+
+    res.status(200).json({ message: "Vehicle deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Server Error", error: error.message });
+  }
+};
+//user can retrieve a specific vehicle's detail
+const getVehicleById = async (req, res) => {
+  try {
+    const { user_id, vehicle_id } = req.params;
+
+    const vehicle = await Vehicle.findOne({ _id: vehicle_id, user: user_id });
+
+    if (!vehicle) {
+      return res.status(404).json({ message: "Vehicle not found" });
+    }
+
+    res.json(vehicle);
+  } catch (error) {
+    res.status(500).json({ message: "Server Error", error: error.message });
+  }
+};
 
 
 
-module.exports = { getUserVehicles,addVehicle };
+
+
+module.exports = { getUserVehicles,addVehicle, deleteVehicle, getVehicleById };
