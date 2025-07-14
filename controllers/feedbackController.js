@@ -14,10 +14,11 @@ const getFeedbacks = async (req, res) => {
 };
 const submitFeedback = async (req, res) => {
   try {
-    const { appointmentId, comment } = req.body;
+    const { id: appointmentId } = req.params;
+    const {  rating, comment } = req.body;
 
     // Validate input
-    if (!appointmentId || !comment) {
+    if (!appointmentId || !rating) {
       return res.status(400).json({
         message: "Appointment ID and comment are required",
       });
@@ -28,6 +29,7 @@ const submitFeedback = async (req, res) => {
       { appointmentId },
       {
         comment,
+        rating,
         feedbackDate: new Date(),
       },
       { new: true }
