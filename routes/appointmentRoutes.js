@@ -1,22 +1,26 @@
 const express = require("express");
 const {
-    createAppointment,
-    getAppointments,
-    getUserAppointments,
-    updateWorkload,
-    suggestionWrite,
-    getWorkload,
-    fetchApppintmetDetails,
-    getAssigned,
-    getCount,
-    getCountAnalyse,
-    upadateWorkloadStatus,
-    getTechnicianAppointmentCount,
-    getDepartmentStatusData,
+  createAppointment,
+  getAppointments,
+  getUserAppointments,
+  updateWorkload,
+  suggestionWrite,
+  getWorkload,
+  fetchApppintmetDetails,
+  getAssigned,
+  getCount,
+  getCountAnalyse,
+  upadateWorkloadStatus,
+  getTechnicianAppointmentCount,
+  getDepartmentStatusData,
+  updateAppointmentDetails,
 } = require("../controllers/appointmentController.js");
 
 const { getServices } = require("../controllers/serviceController");
-const { getUserVehicles,addVehicle } = require("../controllers/vehicleController");
+const {
+  getUserVehicles,
+  addVehicle,
+} = require("../controllers/vehicleController");
 const { assignTechnician } = require("../controllers/assignTechnician.js");
 const { updateAppointmentStatus } = require("../controllers/statusUpdate.js");
 const { tStatusUpdate } = require("../controllers/TStatusUpdate.js");
@@ -42,8 +46,7 @@ router.get("/user/:userId", getUserAppointments);
 router.get("/services", getServices);
 router.get("/:appointment_id", fetchApppintmetDetails); //Fetch detail of a specific appointment
 
-
-router.post("/vehicles/:user_id",addVehicle);
+router.post("/vehicles/:user_id", addVehicle);
 router.get("/vehicles/:user_id", getUserVehicles);
 
 router.get("/", getAppointments); //fetch all appointments to supervisor dashboard
@@ -63,5 +66,6 @@ router.put("/:appointmentId/suggestions", suggestionWrite);
 router.put("/:appointmentId/workload/:taskId", upadateWorkloadStatus);
 router.put("/:app_id/reason", setReason);
 router.put("/:appointmentId/superby", supervisedBy);
+router.put("/:appointmentId/updateDetails", updateAppointmentDetails);
 
 module.exports = router;

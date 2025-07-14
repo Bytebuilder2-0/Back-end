@@ -204,7 +204,7 @@ const getAppointments = async (req, res) => {
   try {
     const appointments = await Appointment.find(
       {},
-      "vehicleId vehicleNumber model issue services reason workload tech status techMessage contactNumber payment appointmentId suggestion expectedDeliveryDate sconfirmedBy department"
+      "vehicleId vehicleNumber model issue services reason workload tech status techMessage contactNumber payment appointmentId suggestion expectedDeliveryDate preferredDate preferredTime sconfirmedBy department"
     ).populate("tech", "employee_id technician_id department");
     res.json(appointments);
   } catch (error) {
@@ -485,6 +485,37 @@ const getTechnicianAppointmentCount = async (req, res) => {
       .json({ message: "Error fetching technician appointment counts" });
   }
 };
+// appointmentController.js
+const updateAppointmentDetails = async (req, res) => {
+  try {
+    const { appointmentId } = req.params;
+    const { preferredDate, preferredTime, expectedDeliveryDate } = req.body;
+
+    if (!preferredDate || !preferredTime || !expectedDeliveryDate) {
+      return res.status(400).json({ message: "All date fields are required" });
+    }
+
+    const appointment = await Appointment.findById(appointmentId);
+    if (!appointment) {
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+
+    appointment.preferredDate = new Date(preferredDate);
+    appointment.preferredTime = preferredTime;
+    appointment.expectedDeliveryDate = new Date(expectedDeliveryDate);
+
+    await appointment.save();
+
+    res.status(200).json({
+      message: "Appointment details updated successfully",
+      appointment,
+    });
+  } catch (error) {
+    console.error("Error updating appointment details:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
 const getDepartmentStatusData = async (req, res) => {
   try {
     // Step 1: Perform aggregation to group by department and status
@@ -599,5 +630,6 @@ module.exports = {
   getTechMessage,
   upadateWorkloadStatus,
   getTechnicianAppointmentCount,
+  updateAppointmentDetails,
   getDepartmentStatusData,
 };
