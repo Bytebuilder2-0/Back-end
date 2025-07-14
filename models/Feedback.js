@@ -10,6 +10,11 @@ const feedbackSchema = new mongoose.Schema({
     ref: "Appointment",
     required: true,
   },
+  rating: { type: Number,
+    min: 1, 
+    max: 5, 
+    required: true
+    },
   feedbackDate: {
     type: Date,
     default: Date.now,
@@ -22,10 +27,6 @@ const feedbackSchema = new mongoose.Schema({
     type: String,
     enum: ["yes", "no"],
     default: "no",
-  },
-  reply: {
-    type: String,
-    default: "",
   },
   deleted: {
     type: Boolean,
