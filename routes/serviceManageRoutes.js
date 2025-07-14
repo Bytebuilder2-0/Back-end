@@ -1,28 +1,31 @@
+// routes/serviceManageRoutes.js
 const express = require("express");
 const {
-  getAllServices,
-  addService,
-  updateService,
+  viewServices,
+  addServices,
   toggleService,
   deleteService,
-} = require("../controllers/serviceControllerManage");
+  updateService,
+  updateServiceSteps,
+} = require("../controllers/serviceController");
 
 const router = express.Router();
 
 // Fetch all services
-router.get("/", getAllServices);
+router.get("/", viewServices);
 
 // Add a new service
-router.post("/", addService);
+router.post("/", addServices);
 
-//update a new service
+// Toggle service selected status
+router.put("/:id", toggleService); // Update selected field of the service
 
-router.put("/update/:id", updateService);
-
-// update service status
-router.put("/:id", toggleService);
+// Update service name
+router.put("/update/:id", updateService); // Update service name
 
 // Delete a service
-router.delete("/:id", deleteService);
+router.delete("/:id", deleteService); // Delete a service by ID
+//add step
+router.put("/steps/:id", updateServiceSteps);
 
 module.exports = router;
