@@ -200,12 +200,14 @@ const getUserAppointments = async (req, res) => {
 };
 
 // Get all appointments (Supervisor dashboarrd)
+// In appointmentController.js
 const getAppointments = async (req, res) => {
   try {
-    const appointments = await Appointment.find(
-      {},
-      "vehicleId vehicleNumber model issue services reason workload tech status techMessage contactNumber payment appointmentId suggestion expectedDeliveryDate preferredDate preferredTime sconfirmedBy department"
-    ).populate("tech", "employee_id technician_id department");
+    const appointments = await Appointment.find({})
+      .populate("userId", "name email")
+      .populate("tech", "employee_id technician_id department fullName") // Add fullName
+      .populate("sconfirmedBy", "fullName userName") // Add supervisor name
+      .lean();
     res.json(appointments);
   } catch (error) {
     res.status(500).json({ error: error.message });
