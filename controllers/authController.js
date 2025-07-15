@@ -41,24 +41,26 @@ const registerUser = async (req, res) => {
 		if (role === "customer") {
 			const verificationToken = crypto.randomBytes(32).toString("hex");
 
-const newCustomer = new User({
-  name: fullName,
-  email,
-  password: hashedPassword,
-  vehicles: [],
-  isEmailVerified: false,
-  verificationToken,
-});
+			const newCustomer = new User({
+				name: fullName,
+				email,
+				password: hashedPassword,
+				vehicles: [],
+				isEmailVerified: false,
+				verificationToken,
+			});
 
-await newCustomer.save();
-await sendVerificationEmail(email, verificationToken);
+			await newCustomer.save();
+			await sendVerificationEmail(email, verificationToken);
 
 			return res.status(201).json({
-				message: "Customer registered successfully",
+				message: "Customer registered successfully. Please check your email to verify your account.",
 			});
 		}
 
 		// ========== TECHNICIAN, MANAGER, SUPERVISOR ==========
+		const verificationToken = crypto.randomBytes(32).toString("hex");
+		
 		const newUser = new Auth({
 			email,
 			fullName,
@@ -66,8 +68,13 @@ await sendVerificationEmail(email, verificationToken);
 			phone,
 			password: hashedPassword,
 			role,
+			isEmailVerified: false,
+			verificationToken,
 		});
 		const savedUser = await newUser.save();
+
+		// Send verification email for all roles
+		await sendVerificationEmail(email, verificationToken);
 
 		// Technician-specific handling
 		if (role === "technician") {
@@ -117,7 +124,7 @@ await sendVerificationEmail(email, verificationToken);
 		}
 
 		res.status(201).json({
-			message: `${role} registered successfully`,
+			message: `${role} registered successfully. Please check your email to verify your account.`,
 		});
 	} catch (error) {
 		console.error(error);
@@ -147,6 +154,8 @@ const loginUser = async (req, res) => {
 			if (!customer) {
 				return res.status(404).json({ message: "User not found. Please register." });
 			}
+
+			// Email verification not required for login - removed check
 
 			// Match password
 			const isMatch = await bcrypt.compare(password, customer.password);
@@ -180,6 +189,8 @@ const loginUser = async (req, res) => {
 				.status(403)
 				.json({ message: "Your account is disabled. Contact support." });
 		}
+
+		// Email verification not required for login - removed check
 
 		const isMatch = await bcrypt.compare(password, user.password);
 		if (!isMatch) {
@@ -307,8 +318,49 @@ const verifyEmail = async (req, res) => {
   res.status(200).json({ message: "Email verified successfully" });
 };
 
+const resendVerificationEmail = async (req, res) => {
+	try {
+		const { email } = req.body;
 
+		if (!email) {
+			return res.status(400).json({ message: "Email is required" });
+		}
 
+		// Check in both User and Auth collections
+		let user = await User.findOne({ email });
+		let isCustomer = true;
 
+		if (!user) {
+			user = await Auth.findOne({ email });
+			isCustomer = false;
+		}
 
-module.exports = { registerUser, loginUser, logoutUser, forgotPassword, resetPassword, verifyEmail };
+		if (!user) {
+			return res.status(404).json({ message: "User not found" });
+		}
+
+		if (user.isEmailVerified) {
+			return res.status(400).json({ message: "Email is already verified" });
+		}
+
+		// Generate new verification token
+		const verificationToken = crypto.randomBytes(32).toString("hex");
+		user.verificationToken = verificationToken;
+		await user.save();
+
+		// Send verification email
+		await sendVerificationEmail(email, verificationToken);
+
+		res.status(200).json({
+			message: "Verification email sent successfully. Please check your inbox.",
+		});
+	} catch (error) {
+		console.error(error);
+		res.status(500).json({
+			message: "Server Error",
+			error: error.message,
+		});
+	}
+};
+
+module.exports = { registerUser, loginUser, logoutUser, forgotPassword, resetPassword, verifyEmail, resendVerificationEmail };

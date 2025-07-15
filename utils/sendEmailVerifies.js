@@ -1,5 +1,3 @@
-
-
 const nodemailer = require("nodemailer");
 
 const sendVerificationEmail = async (email, token) => {
@@ -12,6 +10,10 @@ const sendVerificationEmail = async (email, token) => {
   });
 
   const verificationUrl = `http://localhost:5173/verify-email?token=${token}`; // frontend URL
+
+  // ✅ Log token for debugging
+  console.log(`Sending verification email to ${email}`);
+  console.log(`Verification URL: ${verificationUrl}`);
 
   const mailOptions = {
     from: process.env.EMAIL_USER,

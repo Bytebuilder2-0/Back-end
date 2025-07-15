@@ -7,7 +7,17 @@ const UserSchema = new mongoose.Schema({
   vehicles: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: "Vehicle"    // Reference to the Vehicle model
-  }]
+  }],
+  isEmailVerified: {
+    type: Boolean,
+    required: true,
+    default: false,
+  },
+  verificationToken: {
+    type: String,
+  },
+  resetPasswordToken: String,
+  resetPasswordExpires: Date,
 }, { timestamps: true });
 
 const User = mongoose.model("User", UserSchema);
