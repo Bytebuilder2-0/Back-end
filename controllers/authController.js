@@ -6,6 +6,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const validator = require("validator");
 const { addToBlacklist } = require("../utils/blacklist.js"); // Import the blacklist utility
+const sendVerificationEmail = require("../utils/sendEmailVerifies.js"); // Import the email utility
 
 // User Registration with Role-based access
 const registerUser = async (req, res) => {
@@ -38,14 +39,19 @@ const registerUser = async (req, res) => {
 
 		// ========== CUSTOMER ONLY ==========
 		if (role === "customer") {
-			const newCustomer = new User({
-				name: fullName,
-				email,
-				password: hashedPassword,
-				vehicles: [], // start empty
-			});
+			const verificationToken = crypto.randomBytes(32).toString("hex");
 
-			await newCustomer.save();
+const newCustomer = new User({
+  name: fullName,
+  email,
+  password: hashedPassword,
+  vehicles: [],
+  isEmailVerified: false,
+  verificationToken,
+});
+
+await newCustomer.save();
+await sendVerificationEmail(email, verificationToken);
 
 			return res.status(201).json({
 				message: "Customer registered successfully",
@@ -281,8 +287,28 @@ const resetPassword = async (req, res) => {
 		res.status(500).json({ message: "Server error" });
 	}
 };
+const verifyEmail = async (req, res) => {
+  const { token } = req.query;
+
+  if (!token) {
+    return res.status(400).json({ message: "Token is required" });
+  }
+
+  const user = await Auth.findOne({ verificationToken: token }) || await User.findOne({ verificationToken: token });
+
+  if (!user) {
+    return res.status(400).json({ message: "Invalid or expired verification token" });
+  }
+
+  user.isEmailVerified = true;
+  user.verificationToken = undefined;
+  await user.save();
+
+  res.status(200).json({ message: "Email verified successfully" });
+};
 
 
 
 
-module.exports = { registerUser, loginUser, logoutUser, forgotPassword, resetPassword };
+
+module.exports = { registerUser, loginUser, logoutUser, forgotPassword, resetPassword, verifyEmail };
