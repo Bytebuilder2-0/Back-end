@@ -5,9 +5,30 @@ const getFeedbacks = async (req, res) => {
   try {
     const feedbacks = await Feedback.find({
       deleted: false,
-      comment: { $ne: "" }, // $ne means "not equal"
+      comment: { $ne: "" },
+    }).populate({
+      path: "appointmentId",
+      select: "_id", // Make sure we only get the ID
+      populate: {
+        path: "userId",
+        select: "name", // Only get the name field from User
+      },
     });
-    res.status(200).json({ message: "Fetched successfully!", data: feedbacks });
+
+    // Map the feedbacks to include the username
+    const feedbacksWithUsername = feedbacks.map((feedback) => {
+      const appointmentId = feedback.appointmentId?._id?.toString(); // Ensure we get the string ID
+      return {
+        ...feedback.toObject(),
+        appointmentId, // Make sure appointmentId is a string
+        username: feedback.appointmentId?.userId?.name || "Unknown",
+      };
+    });
+
+    res.status(200).json({
+      message: "Fetched successfully!",
+      data: feedbacksWithUsername,
+    });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
