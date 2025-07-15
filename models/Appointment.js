@@ -37,6 +37,10 @@ const appointmentSchema = new mongoose.Schema(
       ],
       default: "Checking",
     },
+    feedbackStatus : {
+      type : Boolean,
+      default : false
+    },
     workload: [
       {
         step: { type: Number, required: true }, // Numbering each task

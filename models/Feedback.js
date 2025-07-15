@@ -5,6 +5,10 @@ const feedbackSchema = new mongoose.Schema({
     type: String,
     unique: true,
   },
+  user: { type: mongoose.Schema.Types.ObjectId,
+     ref: 'User', 
+     required: true },
+     
   appointmentId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Appointment",
