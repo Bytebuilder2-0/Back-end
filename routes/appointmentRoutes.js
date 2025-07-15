@@ -14,6 +14,7 @@ const {
   getTechnicianAppointmentCount,
   getDepartmentStatusData,
   updateAppointmentDetails,
+  fetchApppintmetDetailsmanger,
 } = require("../controllers/appointmentController.js");
 
 const { getServices } = require("../controllers/serviceController");
@@ -45,6 +46,7 @@ router.get("/departmentStatusData", getDepartmentStatusData);
 router.get("/user/:userId", getUserAppointments);
 router.get("/services", getServices);
 router.get("/:appointment_id", fetchApppintmetDetails); //Fetch detail of a specific appointment
+router.get("/manager/:appointment_id", fetchApppintmetDetailsmanger); //manager
 
 router.post("/vehicles/:user_id", addVehicle);
 router.get("/vehicles/:user_id", getUserVehicles);

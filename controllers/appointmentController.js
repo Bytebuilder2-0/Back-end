@@ -150,6 +150,25 @@ const fetchApppintmetDetails = async (req, res) => {
 };
 
 // ----- get all appointments related to user -----
+const fetchApppintmetDetailsmanger = async (req, res) => {
+  try {
+    const appointmentId = req.params.appointment_id;
+
+    const appointment = await Appointment.findById(appointmentId)
+      .populate("userId", "name email") // Add this line
+      .populate("tech", "employee_id technician_id department fullName")
+      .populate("sconfirmedBy", "fullName userName");
+
+    if (!appointment) {
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+
+    res.status(200).json(appointment);
+  } catch (error) {
+    console.error("Error fetching appointment:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
 
 const getUserAppointments = async (req, res) => {
   try {
@@ -634,4 +653,5 @@ module.exports = {
   getTechnicianAppointmentCount,
   updateAppointmentDetails,
   getDepartmentStatusData,
+  fetchApppintmetDetailsmanger,
 };
