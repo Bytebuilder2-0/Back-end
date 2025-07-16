@@ -1,4 +1,6 @@
 const Feedback = require("../models/Feedback");
+const Appointment = require("../models/Appointment");
+
 
 //  Fetch feedbacks (excluding deleted)  for manager
 const getFeedbacks = async (req, res) => {
@@ -12,50 +14,105 @@ const getFeedbacks = async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 };
+
 const submitFeedback = async (req, res) => {
   try {
-    const { appointmentId, comment } = req.body;
+    const { id: appointmentId } = req.params;
+    const { rating, comment, actionStatus } = req.body;
+    const userId = req.user.id;
 
     // Validate input
-    if (!appointmentId || !comment) {
+    if (!appointmentId) {
       return res.status(400).json({
-        message: "Appointment ID and comment are required",
+        success: false,
+        message: "Appointment ID is required"
       });
     }
 
-    // Find and update feedback
-    const feedback = await Feedback.findOneAndUpdate(
-      { appointmentId },
-      {
-        comment,
-        feedbackDate: new Date(),
-      },
-      { new: true }
-    );
+    if (!rating || isNaN(rating) || rating < 1 || rating > 5) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide a valid rating (1-5)"
+      });
+    }
 
-    if (!feedback) {
+    // Check if appointment exists
+    const appointment = await Appointment.findById(appointmentId);
+    if (!appointment) {
       return res.status(404).json({
-        message: "No feedback record found for this appointment",
+        success: false,
+        message: "Appointment not found"
       });
     }
 
-    res.status(200).json({
+    // Create new feedback - MUST use appointmentId to match model
+    const feedback = new Feedback({
+      user: userId,
+      appointmentId: appointmentId,  // Changed to match model
+      rating,
+      comment: comment || "",
+      actionStatus: actionStatus || "no"
+      // feedbackDate will be auto-set by model
+    });
+
+    await feedback.save();
+    console.log('Feedback saved successfully:', feedback.feedbackId);
+
+    // Update appointment with feedback reference
+    appointment.feedbackId = feedback._id;
+    appointment.feedbackStatus = true;
+    await appointment.save();
+
+    return res.status(201).json({
+      success: true,
       message: "Feedback submitted successfully",
       data: {
-        feedbackId: feedback.feedbackId,
-        appointmentId: feedback.appointmentId,
+        feedbackId: feedback.feedbackId,  // Using the generated FB00001 ID
+        appointmentId: appointment._id,
+        rating: feedback.rating,
         comment: feedback.comment,
-        feedbackDate: feedback.feedbackDate,
-      },
+        actionStatus: feedback.actionStatus,
+        date: feedback.feedbackDate
+      }
     });
+
   } catch (error) {
-    console.error("Error submitting feedback:", error);
-    res.status(500).json({
+    console.error("Feedback submission error:", error);
+    return res.status(500).json({
+      success: false,
       error: "Failed to submit feedback",
-      details: error.message,
+      details: error.message
     });
   }
 };
+
+// const getUserFeedbacks = async (req,res) =>{
+
+//   try{
+//     const { id } = req.params;
+
+//     if (!mongoose.Types.ObjectId.isValid(userId)) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Invalid user ID format",
+//       });
+//     }    
+//     const userObjectId = new mongoose.Types.ObjectId(userId);
+    
+//     const userExists = await User.exists({ _id: userObjectId });
+//     if (!userExists) {
+//       console.log(`User ${userId} not found`);
+//       return res.status(404).json({
+//         success: false,
+//         message: "User not found",
+//       });
+//     }
+
+
+
+// }
+// };
+
 // after email create i was add  agian to
 const addReply = async (req, res) => {
   try {
@@ -104,4 +161,5 @@ module.exports = {
   addReply,
   updateActionStatus,
   deleteFeedback,
+  // getUserFeedbacks
 };
