@@ -25,7 +25,7 @@ router.post("/create-checkout-session", async (req, res) => {
 		// ✅ Convert budget items to Stripe line items
 		const lineItems = budget.amountAllocations.map((item) => ({
 			price_data: {
-				currency: "usd", // Change to your currency if needed
+				currency: "lkr", // Change to your currency if needed
 				product_data: {
 					name: `Step ${item.step}: ${item.des}`,
 				},
