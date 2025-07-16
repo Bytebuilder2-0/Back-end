@@ -150,6 +150,25 @@ const fetchApppintmetDetails = async (req, res) => {
 };
 
 // ----- get all appointments related to user -----
+const fetchApppintmetDetailsmanger = async (req, res) => {
+  try {
+    const appointmentId = req.params.appointment_id;
+
+    const appointment = await Appointment.findById(appointmentId)
+      .populate("userId", "name email") // Add this line
+      .populate("tech", "employee_id technician_id department fullName")
+      .populate("sconfirmedBy", "fullName userName");
+
+    if (!appointment) {
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+
+    res.status(200).json(appointment);
+  } catch (error) {
+    console.error("Error fetching appointment:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
 
 const getUserAppointments = async (req, res) => {
   try {
@@ -200,12 +219,14 @@ const getUserAppointments = async (req, res) => {
 };
 
 // Get all appointments (Supervisor dashboarrd)
+// In appointmentController.js
 const getAppointments = async (req, res) => {
   try {
-    const appointments = await Appointment.find(
-      {},
-      "vehicleId vehicleNumber model issue services reason workload tech status techMessage contactNumber payment appointmentId suggestion expectedDeliveryDate sconfirmedBy department"
-    ).populate("tech", "employee_id technician_id department");
+    const appointments = await Appointment.find({})
+      .populate("userId", "name email")
+      .populate("tech", "employee_id technician_id department fullName") // Add fullName
+      .populate("sconfirmedBy", "fullName userName") // Add supervisor name
+      .lean();
     res.json(appointments);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -485,6 +506,37 @@ const getTechnicianAppointmentCount = async (req, res) => {
       .json({ message: "Error fetching technician appointment counts" });
   }
 };
+// appointmentController.js
+const updateAppointmentDetails = async (req, res) => {
+  try {
+    const { appointmentId } = req.params;
+    const { preferredDate, preferredTime, expectedDeliveryDate } = req.body;
+
+    if (!preferredDate || !preferredTime || !expectedDeliveryDate) {
+      return res.status(400).json({ message: "All date fields are required" });
+    }
+
+    const appointment = await Appointment.findById(appointmentId);
+    if (!appointment) {
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+
+    appointment.preferredDate = new Date(preferredDate);
+    appointment.preferredTime = preferredTime;
+    appointment.expectedDeliveryDate = new Date(expectedDeliveryDate);
+
+    await appointment.save();
+
+    res.status(200).json({
+      message: "Appointment details updated successfully",
+      appointment,
+    });
+  } catch (error) {
+    console.error("Error updating appointment details:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
 const getDepartmentStatusData = async (req, res) => {
   try {
     // Step 1: Perform aggregation to group by department and status
@@ -599,5 +651,7 @@ module.exports = {
   getTechMessage,
   upadateWorkloadStatus,
   getTechnicianAppointmentCount,
+  updateAppointmentDetails,
   getDepartmentStatusData,
+  fetchApppintmetDetailsmanger,
 };
