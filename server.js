@@ -11,6 +11,7 @@ const budgetRoutes = require("./routes/budgetRoutes.js");
 const userRoutes = require("./routes/userRoutes.js");
 const feedbackRoutes = require("./routes/feedbackRoutes");
 const service = require("./routes/serviceManageRoutes.js");
+const paymentRoutes = require("./routes/paymentRoutes.js");
 const feedbackDisplayRoutes = require("./routes/feedbackdisplay.js");
 
 const authRoutes = require("./routes/authRouter.js");
@@ -29,6 +30,7 @@ app.use(bodyParser.json());
 //Routes
 app.use("/api/feedbackDisplay", feedbackDisplayRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/payment", paymentRoutes);
 app.use(authMiddleware);
 
 app.use("/api/appointments", appointmentRoutes);
