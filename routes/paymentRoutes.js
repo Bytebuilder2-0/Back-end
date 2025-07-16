@@ -6,7 +6,7 @@ const Budget = require("../models/Budget");
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-// ✅ POST /api/payment/create-checkout-session
+// POST /api/payment/create-checkout-session
 router.post("/create-checkout-session", async (req, res) => {
 	try {
 		const { appointmentId } = req.body;
@@ -22,7 +22,7 @@ router.post("/create-checkout-session", async (req, res) => {
 			return res.status(400).json({ error: "No amount allocations found in budget" });
 		}
 
-		// ✅ Convert budget items to Stripe line items
+		//  Convert budget items to Stripe line items
 		const lineItems = budget.amountAllocations.map((item) => ({
 			price_data: {
 				currency: "lkr", // Change to your currency if needed
@@ -40,13 +40,38 @@ router.post("/create-checkout-session", async (req, res) => {
 			payment_method_types: ["card"],
 			line_items: lineItems,
 			mode: "payment",
-			success_url: "http://localhost:5173/payment-success",
+			success_url: `http://localhost:5173/payment-success/${appointmentId}`,
 			cancel_url: "http://localhost:5173/payment-cancel",
 		});
 
 		res.json({ id: session.id });
 	} catch (error) {
 		console.error("Stripe Error:", error);
+		res.status(500).json({ error: error.message });
+	}
+});
+
+//  PUT /api/payment/update-status (called after successful payment)
+router.put("/update-status", async (req, res) => {
+	try {
+		const { appointmentId } = req.body;
+
+		const updatedAppointment = await Appointment.findByIdAndUpdate(
+			appointmentId,
+			{ payment: "Paid", status: "Paid" },
+			{ new: true }
+		);
+
+		if (!updatedAppointment) {
+			return res.status(404).json({ error: "Appointment not found" });
+		}
+
+		res.json({
+			message: "Payment status updated successfully",
+			appointment: updatedAppointment,
+		});
+	} catch (error) {
+		console.error("Error updating payment status:", error);
 		res.status(500).json({ error: error.message });
 	}
 });
