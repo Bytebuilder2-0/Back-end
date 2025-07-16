@@ -33,6 +33,8 @@ const userSchema = new mongoose.Schema({
         supervisorId: { type: String },
 
     },
+    profilePhoto: { type: String, default: "" }, 
+
 
     isDisabled: {
         type: Boolean,
