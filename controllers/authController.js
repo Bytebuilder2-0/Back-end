@@ -315,8 +315,26 @@ const verifyEmail = async (req, res) => {
   user.verificationToken = undefined;
   await user.save();
 
-  res.status(200).json({ message: "Email verified successfully" });
+  // ✅ Generate JWT token after successful verification
+  const tokenPayload = {
+    id: user._id,
+    role: user.role || "customer", // fallback for customers who don't have a role field
+  };
+
+  const jwtToken = jwt.sign(tokenPayload, process.env.JWT_SECRET, { expiresIn: "1d" });
+
+  res.status(200).json({
+    message: "Email verified successfully",
+    token: jwtToken,
+    user: {
+      id: user._id,
+      name: user.fullName || user.name,
+      email: user.email,
+      role: user.role || "customer",
+    },
+  });
 };
+
 
 const resendVerificationEmail = async (req, res) => {
 	try {
