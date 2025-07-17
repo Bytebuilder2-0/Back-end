@@ -22,7 +22,6 @@ const createAppointment = async (req, res) => {
 
     if (
       !services ||
-      !issue ||
       !preferredDate ||
       !expectedDeliveryDate ||
       !contactNumber
@@ -87,7 +86,7 @@ const createAppointment = async (req, res) => {
       vehicleObject,
       vehicleNumber: selectedVehicle.vehicleNumber,
       model: selectedVehicle.model,
-      issue,
+      issue ,
       status: "Checking",
       services: selectedServices,
       preferredDate: preferDate,
