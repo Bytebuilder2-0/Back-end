@@ -20,16 +20,15 @@ const createAppointment = async (req, res) => {
 			contactNumber,
 		} = req.body;
 
-		if (
-			!services ||
-			!issue ||
-			!preferredDate ||
-			!expectedDeliveryDate ||
-			!contactNumber
-		) {
-			return res.status(400).json({ message: "All fields are required......" });
-		}
-		const userId = req.params.user_id;
+    if (
+      !services ||
+      !preferredDate ||
+      !expectedDeliveryDate ||
+      !contactNumber
+    ) {
+      return res.status(400).json({ message: "All fields are required......" });
+    }
+    const userId = req.params.user_id;
 
 		const userVehicles = await Vehicle.find({ user: userId });
 
@@ -87,7 +86,7 @@ const createAppointment = async (req, res) => {
 			vehicleObject,
 			vehicleNumber: selectedVehicle.vehicleNumber,
 			model: selectedVehicle.model,
-			issue,
+			issue ,
 			status: "Checking",
 			services: selectedServices,
 			preferredDate: preferDate,
