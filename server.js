@@ -12,6 +12,7 @@ const userRoutes = require("./routes/userRoutes.js");
 const feedbackRoutes = require("./routes/feedbackRoutes");
 const service = require("./routes/serviceManageRoutes.js");
 const paymentRoutes = require("./routes/paymentRoutes.js");
+const feedbackDisplayRoutes = require("./routes/feedbackdisplay.js");
 
 const authRoutes = require("./routes/authRouter.js");
 const { authMiddleware } = require("./middlewares/userAuthMiddleware.js");
@@ -27,6 +28,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 //Routes
+app.use("/api/feedbackDisplay", feedbackDisplayRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use(authMiddleware);
