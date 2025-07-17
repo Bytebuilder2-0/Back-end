@@ -120,7 +120,6 @@ const getUserFeedbacks = async (req,res) =>{
     });
 }
  catch (error) {
-    console.error('Error fetching feedback:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };

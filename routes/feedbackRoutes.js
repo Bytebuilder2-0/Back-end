@@ -14,7 +14,7 @@ const router = express.Router();
 router.post("/:id/submit", submitFeedback);
 
 router.get("/", getFeedbacks);
-router.get("/:id", getUserFeedbacks);
+router.get("/:id", getUserFeedbacks);   //get feedbacks for relevant user
 
 router.put("/:id/reply", addReply);
 router.put("/:id/action", updateActionStatus);
