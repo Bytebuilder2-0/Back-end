@@ -5,6 +5,8 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const validator = require("validator");
 const { addToBlacklist } = require("../utils/blacklist.js"); // Import the blacklist utility
+const crypto = require("crypto");
+const nodemailer = require("nodemailer");
 
 // User Registration with Role-based access
 const registerUser = async (req, res) => {
@@ -224,4 +226,85 @@ const logoutUser = async (req, res) => {
 	res.status(200).json({ message: "Logout successful" });
 };
 
-module.exports = { registerUser, loginUser, logoutUser };
+
+
+// In-memory OTP store (in production, use Redis or DB)
+const otpStore = new Map();
+
+// Step 1: Send OTP to email
+const sendForgotPasswordOTP = async (req, res) => {
+	const { email } = req.body;
+
+	if (!email) return res.status(400).json({ message: "Email is required" });
+
+	const user = await Auth.findOne({ email }) || await User.findOne({ email });
+	if (!user) return res.status(404).json({ message: "User not found" });
+
+	const otp = Math.floor(100000 + Math.random() * 900000).toString();
+	const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes
+
+	otpStore.set(email, { otp, expiresAt });
+
+	// Send email with OTP (use your own SMTP config)
+	const transporter = nodemailer.createTransport({
+		service: "gmail",
+		auth: {
+			user: process.env.EMAIL_USER,
+			pass: process.env.EMAIL_PASS,
+		},
+	});
+
+	const mailOptions = {
+		from: `"Password Reset" <${process.env.EMAIL_USER}>`,
+		to: email,
+		subject: "Your OTP for Password Reset",
+		text: `Your OTP is: ${otp}. It is valid for 10 minutes.`,
+	};
+
+	try {
+		await transporter.sendMail(mailOptions);
+		res.status(200).json({ message: "OTP sent to your email" });
+	} catch (error) {
+		console.error(error);
+		res.status(500).json({ message: "Failed to send OTP", error: error.message });
+	}
+};
+
+// Step 2: Verify OTP and Reset Password
+const resetPasswordWithOTP = async (req, res) => {
+	const { email, otp, newPassword, confirmPassword } = req.body;
+
+	if (!email || !otp || !newPassword || !confirmPassword) {
+		return res.status(400).json({ message: "All fields are required" });
+	}
+	if (newPassword !== confirmPassword) {
+		return res.status(400).json({ message: "Passwords do not match" });
+	}
+	if (!otpStore.has(email)) {
+		return res.status(400).json({ message: "OTP not found or expired" });
+	}
+
+	const { otp: storedOtp, expiresAt } = otpStore.get(email);
+	if (Date.now() > expiresAt) {
+		otpStore.delete(email);
+		return res.status(400).json({ message: "OTP expired" });
+	}
+	if (otp !== storedOtp) {
+		return res.status(400).json({ message: "Invalid OTP" });
+	}
+
+	const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+	const user = await Auth.findOne({ email }) || await User.findOne({ email });
+	if (!user) return res.status(404).json({ message: "User not found" });
+
+	user.password = hashedPassword;
+	await user.save();
+
+	otpStore.delete(email);
+
+	res.status(200).json({ message: "Password reset successful" });
+};
+
+
+module.exports = { registerUser, loginUser, logoutUser, sendForgotPasswordOTP, resetPasswordWithOTP };
