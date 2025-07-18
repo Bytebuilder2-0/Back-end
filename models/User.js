@@ -4,6 +4,9 @@ const UserSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
+  phone: { type: String, default: "" },
+  profilePhoto: { type: String, default: "" },
+
   vehicles: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: "Vehicle"    // Reference to the Vehicle model
