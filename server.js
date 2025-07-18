@@ -31,6 +31,8 @@ app.use(bodyParser.json());
 app.use("/api/feedbackDisplay", feedbackDisplayRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/payment", paymentRoutes);
+
+
 app.use(authMiddleware);
 
 app.use("/api/appointments", appointmentRoutes);
