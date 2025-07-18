@@ -42,6 +42,8 @@ const registerUser = async (req, res) => {
 			const newCustomer = new User({
 				name: fullName,
 				email,
+				userName,
+				phone,  //========================================================
 				password: hashedPassword,
 				vehicles: [], // start empty
 			});
@@ -205,6 +207,7 @@ const loginUser = async (req, res) => {
 				id: user._id,
 				fullName: user.fullName,
 				userName: user.userName,
+				phone: user.phone,
 				email: user.email,
 				role: user.role,
 			},
