@@ -222,16 +222,40 @@ const getUserAppointments = async (req, res) => {
 // In appointmentController.js
 const getAppointments = async (req, res) => {
   try {
-    const appointments = await Appointment.find({})
-      .populate("userId", "name email")
-      .populate("tech", "employee_id technician_id department fullName") // Add fullName
-      .populate("sconfirmedBy", "fullName userName") // Add supervisor name
-      .lean();
+    const appointments = await Appointment.find(
+      {},
+      "vehicleId vehicleNumber model issue services reason workload tech status techMessage contactNumber payment appointmentId suggestion expectedDeliveryDate sconfirmedBy department preferredDate"
+    )
+      .populate("tech", "employee_id technician_id department")
+      .populate("userId", "name email");
+    //.populate("sconfirmedBy", "fullName userName");
+
     res.json(appointments);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
+
+// appointmentController.js
+
+/*const getAppointmentsnew = async (req, res) => {
+  try {
+    const { status } = req.query; // Fetch status from query parameter
+
+    // If no status is provided, fetch all appointments
+    const filter = status ? { status } : {};
+
+    const appointments = await Appointment.find(filter)
+      .populate("userId", "name email")
+      .populate("tech", "employee_id technician_id department fullName")
+      .populate("sconfirmedBy", "fullName userName")
+      .lean();
+
+    res.json(appointments);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};*/
 
 // 3️ Update workload for an appointment (Supervisor updates workload)
 const updateWorkload = async (req, res) => {
@@ -641,6 +665,7 @@ module.exports = {
   createAppointment,
   getUserAppointments,
   getAppointments,
+  // getAppointmentsnew,
   updateWorkload,
   fetchApppintmetDetails,
   getWorkload,
