@@ -43,7 +43,22 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         required: true,
         default: false,
+    },                    // Additional fields for security and account management
+        failedLoginAttempts: {
+        type: Number,
+        default: 0,
     },
+    isLocked: {
+        type: Boolean,
+        default: false,
+    },
+    unlockOtp: String,
+    unlockOtpExpires: Date,
+    mustChangePassword: {
+        type: Boolean,
+        default: false,
+    },
+
     resetPasswordToken: String,
     resetPasswordExpires: Date,
     verificationToken: String,

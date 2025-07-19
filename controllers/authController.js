@@ -8,6 +8,9 @@ const { addToBlacklist } = require("../utils/blacklist.js"); // Import the black
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 
+const MAX_ATTEMPTS = 3;
+const OTP_EXPIRY_MINUTES = 10;
+
 // User Registration with Role-based access
 const registerUser = async (req, res) => {
 	try {
@@ -126,62 +129,75 @@ const registerUser = async (req, res) => {
 };
 
 // User Login function
+
 const loginUser = async (req, res) => {
 	try {
-		const { email, password } = req.body;
+		const { email, password, otp } = req.body;
 
-		if (!email || !password) {
-			return res.status(400).json({ message: "All fields are required" });
+		if (!email || (!password && !otp)) {
+			return res.status(400).json({ message: "Email and password or OTP are required" });
 		}
 
-		// First, check if user exists in Auth collection
-		let user = await Auth.findOne({ email });
+		let user = await Auth.findOne({ email }) || await User.findOne({ email });
 
 		if (!user) {
-			// If not found in Auth, check in User collection (for customer)
-			const customer = await User.findOne({ email });
+			return res.status(404).json({ message: "User not found. Please register." });
+		}
 
-			if (!customer) {
-				return res.status(404).json({ message: "User not found. Please register." });
+		// ✅ Check if account is locked and trying OTP login
+		if (user.isLocked) {
+			if (!otp) {
+				return res.status(403).json({ message: "Account is locked. Check email for OTP." });
+			}
+			if (otp !== user.unlockOtp || Date.now() > user.unlockOtpExpires) {
+				return res.status(400).json({ message: "Invalid or expired OTP" });
 			}
 
-			// Match password
-			const isMatch = await bcrypt.compare(password, customer.password);
-			if (!isMatch) {
-				return res.status(400).json({ message: "Invalid email or password" });
-			}
+			user.isLocked = false;
+			user.failedLoginAttempts = 0;
+			user.unlockOtp = undefined;
+			user.unlockOtpExpires = undefined;
+			user.mustChangePassword = true;
+			await user.save();
 
-			// Token payload for customer
-			const tokenPayload = {
-				id: customer._id,
-				role: "customer",
-			};
-
-			const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, { expiresIn: "1d" });
-
+			const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: "1d" });
 			return res.status(200).json({
-				message: "Login successful as customer",
+				message: "OTP verified. Account unlocked.",
 				token,
 				user: {
-					id: customer._id,
-					name: customer.name,
-					email: customer.email,
-					role: "customer",
+					id: user._id,
+					email: user.email,
+					role: user.role,
+					mustChangePassword: true,
 				},
 			});
 		}
 
-		// Authenticated user in Auth collection (technician, supervisor, etc.)
-		if (user.isDisabled) {
-			return res
-				.status(403)
-				.json({ message: "Your account is disabled. Contact support." });
-		}
-
+		// ✅ Normal login flow (password-based)
 		const isMatch = await bcrypt.compare(password, user.password);
 		if (!isMatch) {
+			user.failedLoginAttempts = (user.failedLoginAttempts || 0) + 1;
+
+			if (user.failedLoginAttempts >= MAX_ATTEMPTS) {
+				user.isLocked = true;
+
+				const otp = Math.floor(100000 + Math.random() * 900000).toString();
+				user.unlockOtp = otp;
+				user.unlockOtpExpires = Date.now() + OTP_EXPIRY_MINUTES * 60 * 1000;
+
+				await sendOtpEmail(user.email, otp);
+				await user.save();
+
+				return res.status(403).json({ message: "Account locked. OTP sent to email." });
+			}
+
+			await user.save();
 			return res.status(400).json({ message: "Invalid email or password" });
 		}
+
+		// ✅ Password matched — reset failed attempts
+		user.failedLoginAttempts = 0;
+		await user.save();
 
 		let technicianId = null;
 		if (user.role === "technician") {
@@ -200,16 +216,17 @@ const loginUser = async (req, res) => {
 
 		const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, { expiresIn: "1d" });
 
-		res.status(200).json({
+		return res.status(200).json({
 			message: `Login successful as ${user.role}`,
 			token,
 			user: {
 				id: user._id,
-				fullName: user.fullName,
+				fullName: user.fullName || user.name,
 				userName: user.userName,
 				phone: user.phone,
 				email: user.email,
 				role: user.role,
+				mustChangePassword: user.mustChangePassword || false
 			},
 			...(technicianId && { technicianId }),
 		});
@@ -218,6 +235,7 @@ const loginUser = async (req, res) => {
 		res.status(500).json({ message: "Server Error", error: error.message });
 	}
 };
+
 
 const logoutUser = async (req, res) => {
 	const authHeader = req.header("Authorization");
@@ -308,6 +326,24 @@ const resetPasswordWithOTP = async (req, res) => {
 
 	res.status(200).json({ message: "Password reset successful" });
 };
+const sendOtpEmail = async (toEmail, otp) => {
+	const transporter = nodemailer.createTransport({
+		service: "gmail",
+		auth: {
+			user: process.env.EMAIL_USER,
+			pass: process.env.EMAIL_PASS,
+		},
+	});
+
+	const mailOptions = {
+		from: `"Account Unlock" <${process.env.EMAIL_USER}>`,
+		to: toEmail,
+		subject: "Your OTP to Unlock Account",
+		text: `Your OTP is ${otp}. It will expire in 10 minutes.`,
+	};
+
+	await transporter.sendMail(mailOptions);
+};
 
 
-module.exports = { registerUser, loginUser, logoutUser, sendForgotPasswordOTP, resetPasswordWithOTP };
+module.exports = { registerUser, loginUser, logoutUser, sendForgotPasswordOTP, resetPasswordWithOTP, sendOtpEmail };
