@@ -28,6 +28,10 @@ const feedbackSchema = new mongoose.Schema({
     enum: ["yes", "no"],
     default: "no",
   },
+  reply: {
+    type: String,
+    default: "",
+  },
   deleted: {
     type: Boolean,
     default: false,

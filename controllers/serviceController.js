@@ -1,18 +1,17 @@
 const Service = require("../models/Service");
 
-
 // --- Get services -----
 
 const getServices = async (req, res) => {
   try {
-    const services = await Service.find({});
+    // Fetch services where 'selected' is true
+    const services = await Service.find({ selected: true });
     console.log("Fetched services:", services);
     res.status(200).json(services);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
-
 
 //--- Add services  ----
 
@@ -44,7 +43,6 @@ const addServices = async (req, res) => {
       .json({ message: "Internal Server Error", error: error.message });
   }
 };
-
 
 const viewServices = async (req, res) => {
   try {
