@@ -33,6 +33,14 @@ const userSchema = new mongoose.Schema({
         supervisorId: { type: String },
 
     },
+     isApproved: {
+    type: Boolean,
+    default: false,
+    },
+    rejected: {
+    type: Boolean,
+    default: false,
+  },
 
     isDisabled: {
         type: Boolean,
