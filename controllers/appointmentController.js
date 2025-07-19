@@ -370,6 +370,9 @@ const getCount = async (req, res) => {
     const total = await Appointment.countDocuments();
     const pending = await Appointment.countDocuments({ status: "Pending" });
     const confirmed = await Appointment.countDocuments({ status: "Confirmed" });
+    const TAccepted = await Appointment.countDocuments({ status: "Accepted" });
+		const TCompleted = await Appointment.countDocuments({ status: "Task Done" });
+		const TInProgress = await Appointment.countDocuments({ status: "InProgress" });
 
     res.json({ total, pending, confirmed });
   } catch (error) {
