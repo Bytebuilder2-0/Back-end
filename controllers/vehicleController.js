@@ -58,7 +58,7 @@ const getUserVehicles = async (req, res) => {
             return res.status(400).json({ message: "Invalid User ID format" });
         }
 
-        const vehicles = await Vehicle.find({ user: userObjectId }).select("vehicleNumber model");            // Fetch vehicles for the specified user
+        const vehicles = await Vehicle.find({ user: userObjectId });            // Fetch vehicles for the specified user
         console.log("Vehicles found:", vehicles);
 
         if (vehicles.length === 0) {
