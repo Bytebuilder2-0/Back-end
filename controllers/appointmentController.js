@@ -22,7 +22,6 @@ const createAppointment = async (req, res) => {
 
     if (
       !services ||
-      !issue ||
       !preferredDate ||
       !expectedDeliveryDate ||
       !contactNumber
@@ -219,12 +218,11 @@ const getUserAppointments = async (req, res) => {
 };
 
 // Get all appointments (Supervisor dashboarrd)
-// In appointmentController.js
 const getAppointments = async (req, res) => {
   try {
     const appointments = await Appointment.find(
       {},
-      "vehicleId vehicleNumber model issue services reason workload tech status techMessage contactNumber payment appointmentId suggestion expectedDeliveryDate sconfirmedBy department preferredDate"
+      "vehicleId vehicleNumber model issue services reason workload tech status techMessage contactNumber payment appointmentId suggestion  preferredTime expectedDeliveryDate sconfirmedBy department preferredDate"
     )
       .populate("tech", "employee_id technician_id department")
       .populate("userId", "name email");

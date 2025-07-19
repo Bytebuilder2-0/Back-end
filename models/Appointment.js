@@ -17,7 +17,7 @@ const appointmentSchema = new mongoose.Schema(
     vehicleId: { type: Number, unique: true },
     vehicleNumber: { type: String, required: true },
     model: { type: String, required: true },
-    issue: { type: String, required: true },
+    issue: { type: String, required: false },
     reason: { type: String, default: null },
     status: {
       type: String,

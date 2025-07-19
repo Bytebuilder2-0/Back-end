@@ -107,32 +107,43 @@ const submitFeedback = async (req, res) => {
   }
 };
 
-// const getUserFeedbacks = async (req,res) =>{
+const getUserFeedbacks = async (req,res) =>{
+  
+  try{
 
-//   try{
-//     const { id } = req.params;
+     const { id } = req.params;
+    const appointment = await Appointment.findOne({
+      _id: id,
+      feedbackStatus: true
+    }).populate('feedbackId'); 
 
-//     if (!mongoose.Types.ObjectId.isValid(userId)) {
-//       return res.status(400).json({
-//         success: false,
-//         message: "Invalid user ID format",
-//       });
-//     }    
-//     const userObjectId = new mongoose.Types.ObjectId(userId);
+   if (!appointment) {
+      return res.status(404).json({ message: 'Appointment not found' });
+    }  
     
-//     const userExists = await User.exists({ _id: userObjectId });
-//     if (!userExists) {
-//       console.log(`User ${userId} not found`);
-//       return res.status(404).json({
-//         success: false,
-//         message: "User not found",
-//       });
-//     }
+    const feedback = appointment.feedbackId;
 
+     if (!feedback) {
+      return res.status(404).json({ message: 'Feedback details not found' });
+    }
 
+    res.json({
+      success: true,
+      data: feedback,
+      appointmentDetails: {
+        preferredDate : appointment.preferredDate,
+        vehicleNumber: appointment.vehicleNumber,
+        model: appointment.model,
+        services: appointment.services,
+        status: appointment.status
+      }
 
-// }
-// };
+    });
+}
+ catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
 
 // after email create i was add  agian to
 const addReply = async (req, res) => {
@@ -182,5 +193,5 @@ module.exports = {
   addReply,
   updateActionStatus,
   deleteFeedback,
-  // getUserFeedbacks
+  getUserFeedbacks
 };
