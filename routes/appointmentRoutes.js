@@ -2,6 +2,7 @@ const express = require("express");
 const {
   createAppointment,
   getAppointments,
+  //getAppointmentsnew,
   getUserAppointments,
   updateWorkload,
   suggestionWrite,
@@ -52,6 +53,7 @@ router.post("/vehicles/:user_id", addVehicle);
 router.get("/vehicles/:user_id", getUserVehicles);
 
 router.get("/", getAppointments); //fetch all appointments to supervisor dashboard
+//router.get("/appointments", getAppointmentsnew);
 router.put("/:id/workload", updateWorkload);
 router.get("/:id/workload", getWorkload);
 router.get("/:id/techMessage", getTechMessage);
