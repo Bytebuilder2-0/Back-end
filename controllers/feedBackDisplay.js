@@ -10,7 +10,7 @@ const getFeedbacks = async (req, res) => {
       select: "_id",
       populate: {
         path: "userId",
-        select: "name email", // Pass name and email only
+        select: "name email profilePhoto", // Pass name and email only
       },
     });
 
@@ -30,6 +30,7 @@ const getFeedbacks = async (req, res) => {
         userComment: feedback.comment,
         adminReply: feedback.reply,
         feedbackDate: feedback.feedbackDate,
+        rating: feedback.rating,
         // Removed avatarUrl from here
       };
     });
