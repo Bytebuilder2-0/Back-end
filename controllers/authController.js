@@ -394,6 +394,18 @@ const rejectUser = async (req, res) => {
     res.status(500).json({ message: "Error rejecting user", error: err.message });
   }
 };
+// GET /api/auth/profile
+const getStaffProfile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const user = await Auth.findById(userId).select("-password");
+    if (!user) return res.status(404).json({ message: "User not found" });
+    res.status(200).json({ user });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
 
 
 
@@ -407,6 +419,7 @@ module.exports = {
 	resetPasswordWithOTP ,
 	approveUser , 
 	getPendingUsers,
-	rejectUser
+	rejectUser,
+    getStaffProfile
 
 };

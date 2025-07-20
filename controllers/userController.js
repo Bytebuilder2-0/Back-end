@@ -69,6 +69,7 @@ const updateUserProfile = async (req, res) => {
     const userId = req.user.id;
     const { email, userName, phone, password } = req.body;
     const profilePhoto = req.file?.path;
+    const role = req.user.role;//-------------------------------------------------
 
     const updateData = {};
 
