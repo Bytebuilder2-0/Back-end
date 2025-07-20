@@ -219,16 +219,41 @@ const getUserAppointments = async (req, res) => {
 
 // Get all appointments (Supervisor dashboarrd)
 const getAppointments = async (req, res) => {
-	try {
-		const appointments = await Appointment.find(
-			{},
-			"vehicleId vehicleNumber model issue services reason workload tech status techMessage contactNumber payment appointmentId suggestion expectedDeliveryDate sconfirmedBy department preferredDate"
-		).populate("tech", "employee_id technician_id department");
-		res.json(appointments);
-	} catch (error) {
-		res.status(500).json({ error: error.message });
-	}
+  try {
+    const appointments = await Appointment.find(
+      {},
+      "vehicleId vehicleNumber model issue services reason workload tech status techMessage contactNumber payment appointmentId suggestion  preferredTime expectedDeliveryDate sconfirmedBy department preferredDate"
+    )
+      .populate("tech", "employee_id technician_id department")
+      .populate("userId", "name email");
+    //.populate("sconfirmedBy", "fullName userName");
+
+    res.json(appointments);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
+
+// appointmentController.js
+
+/*const getAppointmentsnew = async (req, res) => {
+  try {
+    const { status } = req.query; // Fetch status from query parameter
+
+    // If no status is provided, fetch all appointments
+    const filter = status ? { status } : {};
+
+    const appointments = await Appointment.find(filter)
+      .populate("userId", "name email")
+      .populate("tech", "employee_id technician_id department fullName")
+      .populate("sconfirmedBy", "fullName userName")
+      .lean();
+
+    res.json(appointments);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};*/
 
 // 3️ Update workload for an appointment (Supervisor updates workload)
 const updateWorkload = async (req, res) => {
@@ -338,10 +363,13 @@ const getWorkload = (req, res) => {
 };
 
 const getCount = async (req, res) => {
-	try {
-		const total = await Appointment.countDocuments();
-		const pending = await Appointment.countDocuments({ status: "Pending" });
-		const confirmed = await Appointment.countDocuments({ status: "Confirmed" });
+  try {
+    const total = await Appointment.countDocuments();
+    const pending = await Appointment.countDocuments({ status: "Pending" });
+    const confirmed = await Appointment.countDocuments({ status: "Confirmed" });
+    const TAccepted = await Appointment.countDocuments({ status: "Accepted" });
+		const TCompleted = await Appointment.countDocuments({ status: "Task Done" });
+		const TInProgress = await Appointment.countDocuments({ status: "InProgress" });
 
 		res.json({ total, pending, confirmed });
 	} catch (error) {
@@ -625,20 +653,21 @@ const getDepartmentStatusData = async (req, res) => {
 
 //chamod
 module.exports = {
-	createAppointment,
-	getUserAppointments,
-	getAppointments,
-	updateWorkload,
-	fetchApppintmetDetails,
-	getWorkload,
-	suggestionWrite,
-	getCount,
-	getCountAnalyse,
-	getAssigned,
-	getTechMessage,
-	upadateWorkloadStatus,
-	getTechnicianAppointmentCount,
-	updateAppointmentDetails,
-	getDepartmentStatusData,
-	fetchApppintmetDetailsmanger,
+  createAppointment,
+  getUserAppointments,
+  getAppointments,
+  // getAppointmentsnew,
+  updateWorkload,
+  fetchApppintmetDetails,
+  getWorkload,
+  suggestionWrite,
+  getCount,
+  getCountAnalyse,
+  getAssigned,
+  getTechMessage,
+  upadateWorkloadStatus,
+  getTechnicianAppointmentCount,
+  updateAppointmentDetails,
+  getDepartmentStatusData,
+  fetchApppintmetDetailsmanger,
 };

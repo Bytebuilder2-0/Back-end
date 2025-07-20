@@ -14,9 +14,7 @@ const getBudgetDetails = async(req, res) => {
         const budget = await Budget.findOne({ appointmentId });
 
         if (!budget) {
-            return res
-                .status(404)
-                .json({ message: "Budget not found for this appointment" });
+            return res.status(404).json({ message: "Budget not found for this appointment" });
         }
 
         res.status(200).json(budget);
@@ -29,42 +27,38 @@ const getBudgetDetails = async(req, res) => {
 // POST: Update Amount for a Specific Workload Step in Budget
 const updateBudgetAmount = async(req, res) => {
     const { appid } = req.params;
-    const { step, amount } = req.body;
+    const { step, amount, des } = req.body;
 
     if (!mongoose.isValidObjectId(appid)) {
         return res.status(400).json({ message: "Invalid appointment ID format" });
     }
 
     if (typeof step !== "number" || typeof amount !== "number") {
-        return res
-            .status(400)
-            .json({ message: "Step and amount must be valid numbers" });
+        return res.status(400).json({ message: "Step and amount must be valid numbers" });
     }
-    const appointmentId = appid;
 
     try {
-        // Find the budget
-        const budget = await Budget.findOne({ appointmentId });
+        const budget = await Budget.findOne({ appointmentId: appid });
 
         if (!budget) {
-            return res
-                .status(404)
-                .json({ message: "Budget not found for this appointment" });
+            return res.status(404).json({ message: "Budget not found for this appointment" });
         }
 
-        // Find the specific workload step inside amountAllocations
-        const allocation = budget.amountAllocations.find(
-            (item) => item.step === step
-        );
+        // Find existing step
+        const allocation = budget.amountAllocations.find((item) => item.step === step);
 
-        if (!allocation) {
-            return res
-                .status(404)
-                .json({ message: `Step ${step} not found in budget` });
+        if (allocation) {
+            // Update existing step
+            allocation.amount = amount;
+            allocation.des = des || allocation.des; // if description provided, update it
+        } else {
+            // Add new step
+            budget.amountAllocations.push({
+                step,
+                des: des || `Step ${step}`, // default description if not provided
+                amount,
+            });
         }
-
-        // Update the amount for that step
-        allocation.amount = amount;
 
         // Recalculate totalAmount
         budget.totalAmount = budget.amountAllocations.reduce(
@@ -75,11 +69,13 @@ const updateBudgetAmount = async(req, res) => {
         await budget.save();
 
         res.status(200).json({
-            message: `Amount updated for step ${step}`,
+            message: allocation ?
+                `Step ${step} updated successfully` :
+                `Step ${step} added successfully`,
             budget,
         });
     } catch (error) {
-        console.error("Error updating budget:", error);
+        console.error("Error updating/adding budget:", error);
         res.status(500).json({ message: "Internal server error" });
     }
 };
