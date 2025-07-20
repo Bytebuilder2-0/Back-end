@@ -13,6 +13,7 @@ const feedbackRoutes = require("./routes/feedbackRoutes");
 const service = require("./routes/serviceManageRoutes.js");
 const paymentRoutes = require("./routes/paymentRoutes.js");
 const feedbackDisplayRoutes = require("./routes/feedbackdisplay.js");
+const supervisorRoutes = require("./routes/supervisorRoutes.js");
 
 const authRoutes = require("./routes/authRouter.js");
 const { authMiddleware } = require("./middlewares/userAuthMiddleware.js");
@@ -28,6 +29,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 //Routes
+
 app.use("/api/feedbackDisplay", feedbackDisplayRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/payment", paymentRoutes);
@@ -39,6 +41,7 @@ app.use("/api/budget", budgetRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/feedback", feedbackRoutes);
 app.use("/api/servicesManage", service);
+app.use("/api/supervisor", supervisorRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(` Server running on port ${PORT}`));
