@@ -33,7 +33,6 @@ const appointmentSchema = new mongoose.Schema(
         "InProgress", //task is started
         "Task Done", //task completed by tech
         "Paid", //money paid by the customer
-        "All done", //submit feedback and appoitment process completed
       ],
       default: "Checking",
     },
