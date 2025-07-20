@@ -31,6 +31,8 @@ const getFeedbacks = async (req, res) => {
         adminReply: feedback.reply,
         feedbackDate: feedback.feedbackDate,
         rating: feedback.rating,
+        profilePhoto: feedback.appointmentId?.userId?.profilePhoto || "",
+
         // Removed avatarUrl from here
       };
     });
