@@ -132,6 +132,7 @@ const getUserFeedbacks = async (req,res) =>{
       data: feedback,
       appointmentDetails: {
         preferredDate : appointment.preferredDate,
+        expectedDeliveryDate : appointment.expectedDeliveryDate,
         vehicleNumber: appointment.vehicleNumber,
         model: appointment.model,
         services: appointment.services,
