@@ -1,13 +1,15 @@
 const Feedback = require("../models/Feedback");
 const Appointment = require("../models/Appointment");
 
-
 //  Fetch feedbacks (excluding deleted)  for manager
 const getFeedbacks = async (req, res) => {
   try {
     const feedbacks = await Feedback.find({
       deleted: false,
-      comment: { $ne: "" },
+      $or: [
+        { rating: { $exists: true, $ne: null } }, // Rating exists and is not null
+        { comment: { $ne: "" } }, // Comment is not empty string
+      ],
     }).populate({
       path: "appointmentId",
       select: "_id", // Make sure we only get the ID
@@ -46,14 +48,14 @@ const submitFeedback = async (req, res) => {
     if (!appointmentId) {
       return res.status(400).json({
         success: false,
-        message: "Appointment ID is required"
+        message: "Appointment ID is required",
       });
     }
 
     if (!rating || isNaN(rating) || rating < 1 || rating > 5) {
       return res.status(400).json({
         success: false,
-        message: "Please provide a valid rating (1-5)"
+        message: "Please provide a valid rating (1-5)",
       });
     }
 
@@ -62,22 +64,22 @@ const submitFeedback = async (req, res) => {
     if (!appointment) {
       return res.status(404).json({
         success: false,
-        message: "Appointment not found"
+        message: "Appointment not found",
       });
     }
 
     // Create new feedback - MUST use appointmentId to match model
     const feedback = new Feedback({
       user: userId,
-      appointmentId: appointmentId,  // Changed to match model
+      appointmentId: appointmentId, // Changed to match model
       rating,
       comment: comment || "",
-      actionStatus: actionStatus || "no"
+      actionStatus: actionStatus || "no",
       // feedbackDate will be auto-set by model
     });
 
     await feedback.save();
-    console.log('Feedback saved successfully:', feedback.feedbackId);
+    console.log("Feedback saved successfully:", feedback.feedbackId);
 
     // Update appointment with feedback reference
     appointment.feedbackId = feedback._id;
@@ -88,60 +90,55 @@ const submitFeedback = async (req, res) => {
       success: true,
       message: "Feedback submitted successfully",
       data: {
-        feedbackId: feedback.feedbackId,  // Using the generated FB00001 ID
+        feedbackId: feedback.feedbackId, // Using the generated FB00001 ID
         appointmentId: appointment._id,
         rating: feedback.rating,
         comment: feedback.comment,
         actionStatus: feedback.actionStatus,
-        date: feedback.feedbackDate
-      }
+        date: feedback.feedbackDate,
+      },
     });
-
   } catch (error) {
     console.error("Feedback submission error:", error);
     return res.status(500).json({
       success: false,
       error: "Failed to submit feedback",
-      details: error.message
+      details: error.message,
     });
   }
 };
 
-const getUserFeedbacks = async (req,res) =>{
-  
-  try{
-
-     const { id } = req.params;
+const getUserFeedbacks = async (req, res) => {
+  try {
+    const { id } = req.params;
     const appointment = await Appointment.findOne({
       _id: id,
-      feedbackStatus: true
-    }).populate('feedbackId'); 
+      feedbackStatus: true,
+    }).populate("feedbackId");
 
-   if (!appointment) {
-      return res.status(404).json({ message: 'Appointment not found' });
-    }  
-    
+    if (!appointment) {
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+
     const feedback = appointment.feedbackId;
 
-     if (!feedback) {
-      return res.status(404).json({ message: 'Feedback details not found' });
+    if (!feedback) {
+      return res.status(404).json({ message: "Feedback details not found" });
     }
 
     res.json({
       success: true,
       data: feedback,
       appointmentDetails: {
-        preferredDate : appointment.preferredDate,
+        preferredDate: appointment.preferredDate,
         vehicleNumber: appointment.vehicleNumber,
         model: appointment.model,
         services: appointment.services,
-        status: appointment.status
-      }
-
+        status: appointment.status,
+      },
     });
-}
- catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
@@ -193,5 +190,5 @@ module.exports = {
   addReply,
   updateActionStatus,
   deleteFeedback,
-  getUserFeedbacks
+  getUserFeedbacks,
 };

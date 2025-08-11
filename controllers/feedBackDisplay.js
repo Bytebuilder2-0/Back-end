@@ -4,7 +4,6 @@ const getFeedbacks = async (req, res) => {
     const feedbacks = await Feedback.find({
       actionStatus: "yes",
       deleted: false,
-      comment: { $ne: "" },
     }).populate({
       path: "appointmentId",
       select: "_id",
@@ -30,6 +29,7 @@ const getFeedbacks = async (req, res) => {
         userComment: feedback.comment,
         adminReply: feedback.reply,
         feedbackDate: feedback.feedbackDate,
+        rating: feedback.rating,
         // Removed avatarUrl from here
       };
     });

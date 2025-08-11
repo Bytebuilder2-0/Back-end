@@ -225,8 +225,8 @@ const getAppointments = async (req, res) => {
       "vehicleId vehicleNumber model issue services reason workload tech status techMessage contactNumber payment appointmentId suggestion  preferredTime expectedDeliveryDate sconfirmedBy department preferredDate"
     )
       .populate("tech", "employee_id technician_id department")
-      .populate("userId", "name email");
-    // .populate("sconfirmedBy", "fullName userName");
+      .populate("userId", "name email")
+      .populate("sconfirmedBy", "fullName userName");
 
     res.json(appointments);
   } catch (error) {
