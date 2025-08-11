@@ -1,40 +1,75 @@
 const express = require("express");
 const {
-    createAppointment,
-    getAppointments,
-    getUserAppointments,
-    updateWorkload,
-    suggestionWrite,
-    getWorkload,
-    fetchApppintmetDetails,
-    getAssigned
+  createAppointment,
+  getAppointments,
+  //getAppointmentsnew,
+  getUserAppointments,
+  updateWorkload,
+  suggestionWrite,
+  getWorkload,
+  fetchApppintmetDetails,
+  getAssigned,
+  getCount,
+  getCountAnalyse,
+  upadateWorkloadStatus,
+  getTechnicianAppointmentCount,
+  getDepartmentStatusData,
+  updateAppointmentDetails,
+  fetchApppintmetDetailsmanger,
 } = require("../controllers/appointmentController.js");
-const { authMiddleware } = require("../middlewares/userAuthMiddleware.js");
+
 const { getServices } = require("../controllers/serviceController");
-const { getUserVehicles } = require("../controllers/vehicleController");
+const {
+  getUserVehicles,
+  addVehicle,
+} = require("../controllers/vehicleController");
 const { assignTechnician } = require("../controllers/assignTechnician.js");
 const { updateAppointmentStatus } = require("../controllers/statusUpdate.js");
+const { tStatusUpdate } = require("../controllers/TStatusUpdate.js");
+const { tSuggestionWrite } = require("../controllers/tSuggestionWrite.js");
+const { getTechMessage } = require("../controllers/appointmentController.js");
+const { setReason } = require("../controllers/reasonSet.js");
+const { supervisedBy } = require("../controllers/supervisedBy.js");
+
+const userAuthMiddleware = require("../middlewares/userAuthMiddleware.js");
+const { authorizeRoles } = require("../middlewares/authorizeRoles.js");
 
 const router = express.Router();
 
+router.get("/statusCounts", getCount);
+
 router.post("/:user_id", createAppointment);
+
+router.get("/statusCounts", authorizeRoles("supervisor"), getCount);
+router.get("/statusCountsc", getCountAnalyse);
+router.get("/statusCountscheck", getTechnicianAppointmentCount);
+router.get("/departmentStatusData", getDepartmentStatusData);
 router.get("/user/:userId", getUserAppointments);
 router.get("/services", getServices);
 router.get("/:appointment_id", fetchApppintmetDetails); //Fetch detail of a specific appointment
+router.get("/manager/:appointment_id", fetchApppintmetDetailsmanger); //manager
 
-
+router.post("/vehicles/:user_id", addVehicle);
 router.get("/vehicles/:user_id", getUserVehicles);
 
 router.get("/", getAppointments); //fetch all appointments to supervisor dashboard
+//router.get("/appointments", getAppointmentsnew);
 router.put("/:id/workload", updateWorkload);
 router.get("/:id/workload", getWorkload);
+router.get("/:id/techMessage", getTechMessage);
 //me
 router.get("/completed", getAssigned);
 
-
+router.put("/:id/workload", updateWorkload);
 router.put("/:appointmentId/assign2", assignTechnician);
 
 router.put("/:appointmentId/statusUpdate", updateAppointmentStatus);
+router.put("/:appointmentId/tStatusUpdate", tStatusUpdate);
+router.put("/:appointmentId/tSuggestionWrite", tSuggestionWrite);
 router.put("/:appointmentId/suggestions", suggestionWrite);
+router.put("/:appointmentId/workload/:taskId", upadateWorkloadStatus);
+router.put("/:app_id/reason", setReason);
+router.put("/:appointmentId/superby", supervisedBy);
+router.put("/:appointmentId/updateDetails", updateAppointmentDetails);
 
 module.exports = router;

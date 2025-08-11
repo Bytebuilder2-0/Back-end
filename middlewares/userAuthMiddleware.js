@@ -1,32 +1,36 @@
+// middleware/authMiddleware.js
 const jwt = require("jsonwebtoken");
+const { isBlacklisted, addToBlacklist } = require("../utils/blacklist.js");
+const User = require("../models/auth.js");
 
-const authMiddleware = (req, res, next) => {
- 
-    const authHeader = req.header("Authorization");
+const authMiddleware = async (req, res, next) => {
+  const authHeader = req.header("Authorization");
 
-    if (!authHeader) {
-        return res.status(401).json({ message: "No token, authorization denied" });
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ message: "No token or invalid format" });
+  }
+
+  const token = authHeader.split(" ")[1];
+
+  if (isBlacklisted(token)) { // this protects the users who loggedout
+    return res.status(401).json({ message: "Token has been blacklisted" });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (err) {
+    console.error("Token verification error:", err);
+
+    if (err.name === "TokenExpiredError") {
+      return res.status(401).json({ message: "Token has expired. Please login again" });
+    } else if (err.name === "JsonWebTokenError") {
+      return res.status(401).json({ message: "Invalid token" });
+    } else {
+      return res.status(500).json({ message: "Internal server error" });
     }
-    if (!authHeader.startsWith("Bearer ")) {
-        return res.status(401).json({ message: "Invalid token format" });
-    }
+  }
+}; 
 
-    // Extract the token
-    const token = authHeader.replace("Bearer ", "");
-
-    if (!token) {
-        return res.status(401).json({ message: "No token, authorization denied" });
-    }
-
-    try {
-        // Verify the token
-        const decoded = jwt.verify(token, "your_secret_key"); 
-        req.user = decoded; 
-        next(); 
-    } catch (err) {
-        console.error("Token verification error:", err);
-        res.status(401).json({ message: "Invalid token" });
-    }
-};
-
-module.exports = {authMiddleware};
+module.exports = { authMiddleware };

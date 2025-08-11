@@ -1,18 +1,26 @@
 const mongoose = require("mongoose");
 
-const serviceSchema = new mongoose.Schema({
-   name: { 
-       type: String, 
-       required: true, 
-       unique:true,
-   },
-   description: { 
-       type: String, 
-       required: false 
-   }
-}, { timestamps: true });
+const serviceSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    selected: {
+      type: Boolean,
+      default: false,
+    },
 
-
+    steps: [
+      {
+        step: { type: Number },
+        description: { type: String },
+      },
+    ],
+  },
+  { timestamps: true }
+);
 
 const Service = mongoose.model("Service", serviceSchema);
 
