@@ -9,16 +9,16 @@ const Feedback = require("../models/Feedback");
 
 // 1️ Create a new appointment (Client submits form)
 const createAppointment = async(req, res) => {
-    try {
-        const {
-            vehicleObject,
-            services,
-            issue,
-            preferredDate,
-            preferredTime,
-            expectedDeliveryDate,
-            contactNumber,
-        } = req.body;
+  	try {
+    		const {
+      			vehicleObject,
+      			services,
+      			issue,
+      			preferredDate,
+      			preferredTime,
+      			expectedDeliveryDate,
+      			contactNumber,
+    		} = req.body;
 
         if (!services ||
             !preferredDate ||
@@ -29,31 +29,31 @@ const createAppointment = async(req, res) => {
         }
         const userId = req.params.user_id;
 
-        const userVehicles = await Vehicle.find({ user: userId });
+    		const userVehicles = await Vehicle.find({ user: userId });
 
-        const selectedVehicle = userVehicles.find(
-            (vehicle) => vehicle._id.toString() === vehicleObject
-        );
+    		const selectedVehicle = userVehicles.find(
+      			(vehicle) => vehicle._id.toString() === vehicleObject
+    		);
 
-        if (!selectedVehicle) {
-            return res.status(400).json({ message: "Invalid vehicle selected" });
-        }
+    		if (!selectedVehicle) {
+      			return res.status(400).json({ message: "Invalid vehicle selected" });
+    		}
 
-        const validServices = await Service.find({}, { name: 1, _id: 0 });
+    		const validServices = await Service.find({}, { name: 1, _id: 0 });
 
-        const validServiceNames = validServices.map((service) =>
-            service.name.trim().toLowerCase()
-        );
+    		const validServiceNames = validServices.map((service) =>
+      			service.name.trim().toLowerCase()
+    		);
 
-        const selectedServices = services.filter((service) =>
-            validServiceNames.includes(service.trim().toLowerCase())
-        );
+    		const selectedServices = services.filter((service) =>
+      			validServiceNames.includes(service.trim().toLowerCase())
+    		);
 
-        if (selectedServices.length === 0) {
-            return res
-                .status(400)
-                .json({ message: "Please select at least one valid service" });
-        }
+    		if (selectedServices.length === 0) {
+      			return res
+        				.status(400)
+        				.json({ message: "Please select at least one valid service" });
+    		}
 
         if (!/^94\d{9}$/.test(contactNumber)) {
             return res.status(400).json({
@@ -61,115 +61,115 @@ const createAppointment = async(req, res) => {
             });
         }
 
-        const preferDate = new Date(preferredDate);
-        const deliveryDate = new Date(expectedDeliveryDate);
-        if (deliveryDate <= new Date() && preferDate <= new Date()) {
-            return res.status(400).json({ message: "Date must be in the future" });
-        }
-        if (deliveryDate < preferDate) {
-            return res
-                .status(400)
-                .json({ message: "Delivery date must be future than prefered date " });
-        }
+    		const preferDate = new Date(preferredDate);
+    		const deliveryDate = new Date(expectedDeliveryDate);
+    		if (deliveryDate <= new Date() && preferDate <= new Date()) {
+      			return res.status(400).json({ message: "Date must be in the future" });
+    		}
+    		if (deliveryDate < preferDate) {
+      			return res
+        				.status(400)
+        				.json({ message: "Delivery date must be future than prefered date " });
+    		}
 
-        if (!/^\d{1,2}:\d{2} (AM|PM)$/i.test(preferredTime)) {
-            return res
-                .status(400)
-                .json({ message: "Invalid preferred time format (use HH:MM AM/PM)" });
-        }
+    		if (!/^\d{1,2}:\d{2} (AM|PM)$/i.test(preferredTime)) {
+      			return res
+        				.status(400)
+        				.json({ message: "Invalid preferred time format (use HH:MM AM/PM)" });
+    		}
 
-        // Step 1: Create a new appointment
-        const newAppointment = new Appointment({
-            userId,
-            vehicleObject,
-            vehicleNumber: selectedVehicle.vehicleNumber,
-            model: selectedVehicle.model,
-            issue,
-            status: "Checking",
-            services: selectedServices,
-            preferredDate: preferDate,
-            preferredTime,
-            expectedDeliveryDate: deliveryDate,
-            contactNumber,
-        });
+    		// Step 1: Create a new appointment
+    		const newAppointment = new Appointment({
+      			userId,
+      			vehicleObject,
+      			vehicleNumber: selectedVehicle.vehicleNumber,
+      			model: selectedVehicle.model,
+      			issue ,
+      			status: "Checking",
+      			services: selectedServices,
+      			preferredDate: preferDate,
+      			preferredTime,
+      			expectedDeliveryDate: deliveryDate,
+      			contactNumber,
+    		});
 
-        await newAppointment.save();
+    		await newAppointment.save();
 
-        // Create feedback
-        const newFeedback = new Feedback({
-            appointmentId: newAppointment._id,
-        });
+    		// Create feedback
+    		const newFeedback = new Feedback({
+      			appointmentId: newAppointment._id,
+    		});
 
-        await newFeedback.save();
-        newAppointment.feedbackId = newFeedback._id;
+    		await newFeedback.save();
+    		newAppointment.feedbackId = newFeedback._id;
 
-        // Step 2: Create a linked budget (only references appointmentId)
-        const newBudget = new Budget({
-            appointmentId: newAppointment._id, // Link to appointment
-            amountAllocations: [],
-            totalAmount: 0,
-        });
+    		// Step 2: Create a linked budget (only references appointmentId)
+    		const newBudget = new Budget({
+      			appointmentId: newAppointment._id, // Link to appointment
+      			amountAllocations: [],
+      			totalAmount: 0,
+    		});
 
-        await newBudget.save();
+    		await newBudget.save();
 
-        // Step 3: (Optional) Link the budget in the appointment model if needed
-        newAppointment.budgetId = newBudget._id;
-        await newAppointment.save();
+    		// Step 3: (Optional) Link the budget in the appointment model if needed
+    		newAppointment.budgetId = newBudget._id;
+    		await newAppointment.save();
 
-        res.status(201).json({
-            message: "Appointment,Budget and FeedBack created successfully",
-            appointment: newAppointment,
-            budget: newBudget,
-            feedback: newFeedback,
-        });
-    } catch (error) {
-        console.error("Error creating appointment:", error);
-        console.error("Error:", error.message);
-        res.status(500).json({ error: error.message });
-    }
+    		res.status(201).json({
+      			message: "Appointment,Budget and FeedBack created successfully",
+      			appointment: newAppointment,
+      			budget: newBudget,
+      			feedback: newFeedback,
+    		});
+  	} catch (error) {
+    		console.error("Error creating appointment:", error);
+    		console.error("Error:", error.message);
+    		res.status(500).json({ error: error.message });
+  	}
 };
 
 const fetchApppintmetDetails = async(req, res) => {
-    try {
-        const appointmentId = req.params.appointment_id;
+  	try {
+    		const appointmentId = req.params.appointment_id;
 
-        const appointment = await Appointment.findById(appointmentId);
+    		const appointment = await Appointment.findById(appointmentId);
 
-        if (!appointment) {
-            return res.status(404).json({ message: "Appointment not found" });
-        }
+    		if (!appointment) {
+      			return res.status(404).json({ message: "Appointment not found" });
+    		}
 
-        res.status(200).json(appointment);
-    } catch (error) {
-        console.error("Error fetching appointment:", error);
-        res.status(500).json({ error: error.message });
-    }
+    		res.status(200).json(appointment);
+  	} catch (error) {
+    		console.error("Error fetching appointment:", error);
+    		res.status(500).json({ error: error.message });
+  	}
 };
 
 // ----- get all appointments related to user -----
 const fetchApppintmetDetailsmanger = async(req, res) => {
-    try {
-        const appointmentId = req.params.appointment_id;
+  	try {
+    		const appointmentId = req.params.appointment_id;
 
-        const appointment = await Appointment.findById(appointmentId)
-            .populate("userId", "name email") // Add this line
-            .populate("tech", "employee_id technician_id department fullName")
-            .populate("sconfirmedBy", "fullName userName");
+    		const appointment = await Appointment.findById(appointmentId)
+      			.populate("userId", "name email") // Add this line
+      			.populate("tech", "employee_id technician_id department fullName")
+      			.populate("sconfirmedBy", "fullName userName");
 
-        if (!appointment) {
-            return res.status(404).json({ message: "Appointment not found" });
-        }
+    		if (!appointment) {
+      			return res.status(404).json({ message: "Appointment not found" });
+    		}
 
-        res.status(200).json(appointment);
-    } catch (error) {
-        console.error("Error fetching appointment:", error);
-        res.status(500).json({ error: error.message });
-    }
+    		res.status(200).json(appointment);
+  	} catch (error) {
+    		console.error("Error fetching appointment:", error);
+    		res.status(500).json({ error: error.message });
+  	}
 };
 
 const getUserAppointments = async(req, res) => {
-    try {
-        const { userId } = req.params;
+  	try {
+    		const { userId } = req.params;
 
         if (!mongoose.Types.ObjectId.isValid(userId)) {
             return res.status(400).json({
@@ -179,40 +179,40 @@ const getUserAppointments = async(req, res) => {
         }
         const userObjectId = new mongoose.Types.ObjectId(userId);
 
-        const userExists = await User.exists({ _id: userObjectId });
-        if (!userExists) {
-            console.log(`User ${userId} not found`);
-            return res.status(404).json({
-                success: false,
-                message: "User not found",
-            });
-        }
-        // Find all appointments for the user
-        const appointments = await Appointment.find({
-            userId: userObjectId,
-        }).lean();
+    		const userExists = await User.exists({ _id: userObjectId });
+    		if (!userExists) {
+      			console.log(`User ${userId} not found`);
+      			return res.status(404).json({
+        				success: false,
+        				message: "User not found",
+      			});
+    		}
+    		// Find all appointments for the user
+    		const appointments = await Appointment.find({
+      			userId: userObjectId,
+    		}).lean();
 
-        console.log(`Found ${appointments.length} appointments for user ${userId}`);
-        console.log("Found appointments:", appointments);
+    		console.log(`Found ${appointments.length} appointments for user ${userId}`);
+    		console.log("Found appointments:", appointments);
 
-        if (appointments.length === 0) {
-            console.log(`[WARN] No appointments found for user ${userId}`);
-        }
-        res.status(200).json({
-            success: true,
-            count: appointments.length,
-            data: appointments,
-        });
-    } catch (error) {
-        console.error("Error fetching user appointments:", error);
-        if (!res.headersSent) {
-            res.status(500).json({
-                success: false,
-                message: "Server error while fetching appointments",
-                error: error.message,
-            });
-        }
-    }
+    		if (appointments.length === 0) {
+      			console.log(`[WARN] No appointments found for user ${userId}`);
+    		}
+    		res.status(200).json({
+      			success: true,
+      			count: appointments.length,
+      			data: appointments,
+    		});
+  	} catch (error) {
+    		console.error("Error fetching user appointments:", error);
+    		if (!res.headersSent) {
+      			res.status(500).json({
+        				success: false,
+        				message: "Server error while fetching appointments",
+        				error: error.message,
+      			});
+    		}
+  	}
 };
 
 // Get all appointments (Supervisor dashboarrd)
@@ -254,20 +254,20 @@ const getAppointments = async(req, res) => {
 
 // 3️ Update workload for an appointment (Supervisor updates workload)
 const updateWorkload = async(req, res) => {
-    // Expecting an array of objects
-    const { workload } = req.body;
-    const { id } = req.params;
+  	// Expecting an array of objects
+  	const { workload } = req.body;
+  	const { id } = req.params;
 
-    if (!mongoose.isValidObjectId(id)) {
-        return res.status(400).json({ message: "Invalid appointment ID format" });
-    }
+  	if (!mongoose.isValidObjectId(id)) {
+    		return res.status(400).json({ message: "Invalid appointment ID format" });
+  	}
 
-    try {
-        // Find the appointment
-        const appointment = await Appointment.findById(id);
-        if (!appointment) {
-            return res.status(404).json({ message: "Appointment not found" });
-        }
+  	try {
+    		// Find the appointment
+    		const appointment = await Appointment.findById(id);
+    		if (!appointment) {
+      			return res.status(404).json({ message: "Appointment not found" });
+    		}
 
         // Validate workload: should be an array with valid items
         if (!Array.isArray(workload) || workload.length === 0) {
@@ -288,9 +288,9 @@ const updateWorkload = async(req, res) => {
             }
         }
 
-        // Update the appointment's workload
-        appointment.workload = workload;
-        await appointment.save();
+    		// Update the appointment's workload
+    		appointment.workload = workload;
+    		await appointment.save();
 
         // Update the linked Budget model with the new workload data
         const updatedBudget = await Budget.findOneAndUpdate({ appointmentId: appointment._id }, {
@@ -301,61 +301,61 @@ const updateWorkload = async(req, res) => {
             })),
         }, { new: true });
 
-        if (!updatedBudget) {
-            return res.status(404).json({ message: "Budget not found" });
-        }
+    		if (!updatedBudget) {
+      			return res.status(404).json({ message: "Budget not found" });
+    		}
 
-        return res.status(200).json({
-            message: "Workload and Budget updated successfully",
-            appointment,
-            budget: updatedBudget,
-        });
-    } catch (error) {
-        console.error("Error updating workload:", error);
-        return res.status(500).json({ message: "Internal server error" });
-    }
+    		return res.status(200).json({
+      			message: "Workload and Budget updated successfully",
+      			appointment,
+      			budget: updatedBudget,
+    		});
+  	} catch (error) {
+    		console.error("Error updating workload:", error);
+    		return res.status(500).json({ message: "Internal server error" });
+  	}
 };
 
 const suggestionWrite = async(req, res) => {
-    const { suggestion } = req.body;
-    const { appointmentId } = req.params;
+  	const { suggestion } = req.body;
+  	const { appointmentId } = req.params;
 
-    if (!mongoose.isValidObjectId(appointmentId)) {
-        return res.status(400).json({ message: "Invalid appointment ID format" });
-    }
+  	if (!mongoose.isValidObjectId(appointmentId)) {
+    		return res.status(400).json({ message: "Invalid appointment ID format" });
+  	}
 
-    try {
-        const appointment = await Appointment.findById(appointmentId);
-        if (!appointment) {
-            return res.status(404).json({ message: "Appointment not found" });
-        }
+  	try {
+    		const appointment = await Appointment.findById(appointmentId);
+    		if (!appointment) {
+      			return res.status(404).json({ message: "Appointment not found" });
+    		}
 
-        if (!suggestion || suggestion.trim() === "") {
-            return res.status(400).json({ message: "Suggestion cannot be empty" });
-        }
+    		if (!suggestion || suggestion.trim() === "") {
+      			return res.status(400).json({ message: "Suggestion cannot be empty" });
+    		}
 
-        appointment.suggestion = suggestion;
-        await appointment.save();
+    		appointment.suggestion = suggestion;
+    		await appointment.save();
 
-        res.json({ message: "Suggestion updated successfully", appointment });
-    } catch (error) {
-        console.error("Error:", error.message);
-        res.status(500).json({ error: error.message });
-    }
+    		res.json({ message: "Suggestion updated successfully", appointment });
+  	} catch (error) {
+    		console.error("Error:", error.message);
+    		res.status(500).json({ error: error.message });
+  	}
 };
 
 const getWorkload = (req, res) => {
-    const appointmentId = req.params.id;
-    Appointment.findById(appointmentId)
-        .then((appointment) => {
-            if (!appointment) {
-                return res.status(404).json({ message: "Appointment not found" });
-            }
-            res.json({ workload: appointment.workload }); // Send the workload data
-        })
-        .catch((error) => {
-            res.status(500).json({ message: "Error fetching workload", error });
-        });
+  	const appointmentId = req.params.id;
+  	Appointment.findById(appointmentId)
+    		.then((appointment) => {
+      			if (!appointment) {
+        				return res.status(404).json({ message: "Appointment not found" });
+      			}
+      			res.json({ workload: appointment.workload }); // Send the workload data
+    		})
+    		.catch((error) => {
+      			res.status(500).json({ message: "Error fetching workload", error });
+    		});
 };
 
 const getCount = async(req, res) => {
@@ -368,89 +368,89 @@ const getCount = async(req, res) => {
         const TCompleted = await Appointment.countDocuments({ status: "Task Done" });
         const TInProgress = await Appointment.countDocuments({ status: "InProgress" });
 
-        res.json({
+    		res.json({
             total: total - cancelled,
             pending: pending,
             confirmed: confirmed
         });
-    } catch (error) {
-        console.error("Error fetching appointment counts:", error);
-        res.status(500).json({ error: "Internal server error" });
-    }
+  	} catch (error) {
+    		console.error("Error fetching appointment counts:", error);
+    		res.status(500).json({ error: "Internal server error" });
+  	}
 };
 const getCountAnalyse = async(req, res) => {
-    try {
-        const total = await Appointment.countDocuments();
-        const pending = await Appointment.countDocuments({ status: "Pending" });
-        const confirmed = await Appointment.countDocuments({ status: "Confirmed" });
-        const checking = await Appointment.countDocuments({ status: "Checking" });
-        const cancelled = await Appointment.countDocuments({ status: "Cancelled" });
-        const rejected = await Appointment.countDocuments({ status: "Reject2" }); // or Reject2 based on your requirement
-        const accepted = await Appointment.countDocuments({ status: "Accepted" });
-        const inProgress = await Appointment.countDocuments({
-            status: "InProgress",
-        });
-        const waiting = await Appointment.countDocuments({
-            status: "Waiting for Technician Confirmation",
-        });
-        const taskDone = await Appointment.countDocuments({ status: "Task Done" });
-        const paid = await Appointment.countDocuments({ status: "Paid" });
+  	try {
+    		const total = await Appointment.countDocuments();
+    		const pending = await Appointment.countDocuments({ status: "Pending" });
+    		const confirmed = await Appointment.countDocuments({ status: "Confirmed" });
+    		const checking = await Appointment.countDocuments({ status: "Checking" });
+    		const cancelled = await Appointment.countDocuments({ status: "Cancelled" });
+    		const rejected = await Appointment.countDocuments({ status: "Reject2" }); // or Reject2 based on your requirement
+    		const accepted = await Appointment.countDocuments({ status: "Accepted" });
+    		const inProgress = await Appointment.countDocuments({
+      			status: "InProgress",
+    		});
+    		const waiting = await Appointment.countDocuments({
+      			status: "Waiting for Technician Confirmation",
+    		});
+    		const taskDone = await Appointment.countDocuments({ status: "Task Done" });
+    		const paid = await Appointment.countDocuments({ status: "Paid" });
 
-        res.json({
-            total,
-            pending,
-            confirmed,
-            checking,
-            cancelled,
-            rejected,
-            inProgress,
-            accepted,
-            inProgress,
-            waiting,
-            taskDone,
-            paid,
-        });
-    } catch (error) {
-        console.error("Error fetching appointment counts:", error);
-        res.status(500).json({ error: "Internal server error" });
-    }
+    		res.json({
+      			total,
+      			pending,
+      			confirmed,
+      			checking,
+      			cancelled,
+      			rejected,
+      			inProgress,
+      			accepted,
+      			inProgress,
+      			waiting,
+      			taskDone,
+      			paid,
+    		});
+  	} catch (error) {
+    		console.error("Error fetching appointment counts:", error);
+    		res.status(500).json({ error: "Internal server error" });
+  	}
 };
 const getAssigned = async(req, res) => {
-    try {
-        const jobs = await Appointment.find({ status: "Assigned" });
-        res.json(jobs);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+  	try {
+    		const jobs = await Appointment.find({ status: "Assigned" });
+    		res.json(jobs);
+  	} catch (err) {
+    		res.status(500).json({ error: err.message });
+  	}
 };
 //chamod
 const getTechMessage = (req, res) => {
-    const appointmentId = req.params.id;
-    Appointment.findById(appointmentId)
-        .then((appointment) => {
-            if (!appointment) {
-                return res.status(404).json({ message: "Appointment not found" });
-            }
-            res.json({ techMessage: appointment.techMessage }); // Send the workload data
-        })
-        .catch((error) => {
-            res.status(500).json({ message: "Error fetching workload", error });
-        });
+  	const appointmentId = req.params.id;
+  	Appointment.findById(appointmentId)
+    		.then((appointment) => {
+      			if (!appointment) {
+        				return res.status(404).json({ message: "Appointment not found" });
+      			}
+      			res.json({ techMessage: appointment.techMessage }); // Send the workload data
+    		})
+    		.catch((error) => {
+      			res.status(500).json({ message: "Error fetching workload", error });
+    		});
 };
 
 const upadateWorkloadStatus = async(req, res) => {
-    try {
-        const { appointmentId, taskId } = req.params;
-        const { status } = req.body;
+  	try {
+    		const { appointmentId, taskId } = req.params;
+    		const { status } = req.body;
 
-        // Validate the appointmentId and taskId
-        if (!mongoose.Types.ObjectId.isValid(appointmentId)) {
-            return res.status(400).json({ message: "Invalid appointment ID" });
-        }
+    		// Validate the appointmentId and taskId
+    		if (!mongoose.Types.ObjectId.isValid(appointmentId)) {
+      			return res.status(400).json({ message: "Invalid appointment ID" });
+    		}
 
-        if (!mongoose.Types.ObjectId.isValid(taskId)) {
-            return res.status(400).json({ message: "Invalid task ID" });
-        }
+    		if (!mongoose.Types.ObjectId.isValid(taskId)) {
+      			return res.status(400).json({ message: "Invalid task ID" });
+    		}
 
         // Validate the status data
         const validStatuses = ["Pending", "In Progress", "Completed"];
@@ -460,59 +460,59 @@ const upadateWorkloadStatus = async(req, res) => {
             });
         }
 
-        // Fetch the appointment by appointmentId
-        const appointment = await Appointment.findById(appointmentId);
-        if (!appointment) {
-            return res.status(404).json({ message: "Appointment not found" });
-        }
+    		// Fetch the appointment by appointmentId
+    		const appointment = await Appointment.findById(appointmentId);
+    		if (!appointment) {
+      			return res.status(404).json({ message: "Appointment not found" });
+    		}
 
-        // Find the task within the workload array
-        const taskIndex = appointment.workload.findIndex(
-            (task) => task._id.toString() === taskId
-        );
-        if (taskIndex === -1) {
-            return res.status(404).json({ message: "Task not found" });
-        }
+    		// Find the task within the workload array
+    		const taskIndex = appointment.workload.findIndex(
+      			(task) => task._id.toString() === taskId
+    		);
+    		if (taskIndex === -1) {
+      			return res.status(404).json({ message: "Task not found" });
+    		}
 
-        // Update the task status
-        appointment.workload[taskIndex].status = status;
+    		// Update the task status
+    		appointment.workload[taskIndex].status = status;
 
-        // Save the updated appointment
-        const updatedAppointment = await appointment.save();
+    		// Save the updated appointment
+    		const updatedAppointment = await appointment.save();
 
-        // Return the updated appointment
-        res.status(200).json({
-            message: "Workload step status updated successfully",
-            appointment: updatedAppointment,
-        });
-    } catch (error) {
-        console.error("Error updating workload status:", error);
-        res.status(500).json({ message: `Server error: ${error.message}` });
-    }
+    		// Return the updated appointment
+    		res.status(200).json({
+      			message: "Workload step status updated successfully",
+      			appointment: updatedAppointment,
+    		});
+  	} catch (error) {
+    		console.error("Error updating workload status:", error);
+    		res.status(500).json({ message: `Server error: ${error.message}` });
+  	}
 };
 const getTechnicianAppointmentCount = async(req, res) => {
-    try {
-        // Perform aggregation to count appointments grouped by technician
-        const technicianAppointments = await Appointment.aggregate([
-            { $group: { _id: "$tech", count: { $sum: 1 } } }, // Group by technician and count appointments
-            {
-                $lookup: {
-                    from: "technicians", // Join with the technicians collection
-                    localField: "_id", // Technician ID in the appointments collection
-                    foreignField: "_id", // Technician ID in the technicians collection
-                    as: "technicianDetails", // Name of the array containing technician info
-                },
-            },
-            { $unwind: "$technicianDetails" }, // Flatten the technician details
-            {
-                $project: {
-                    _id: 0,
-                    technicianId: "$technicianDetails.technician_id", // Technician ID
-                    department: "$technicianDetails.department", // Technician Department
-                    count: 1, // Appointment count
-                },
-            },
-        ]);
+  	try {
+    		// Perform aggregation to count appointments grouped by technician
+    		const technicianAppointments = await Appointment.aggregate([
+      			{ $group: { _id: "$tech", count: { $sum: 1 } } }, // Group by technician and count appointments
+      			{
+        				$lookup: {
+          					from: "technicians", // Join with the technicians collection
+          					localField: "_id", // Technician ID in the appointments collection
+          					foreignField: "_id", // Technician ID in the technicians collection
+          					as: "technicianDetails", // Name of the array containing technician info
+        				},
+      			},
+      			{ $unwind: "$technicianDetails" }, // Flatten the technician details
+      			{
+        				$project: {
+          					_id: 0,
+          					technicianId: "$technicianDetails.technician_id", // Technician ID
+          					department: "$technicianDetails.department", // Technician Department
+          					count: 1, // Appointment count
+        				},
+      			},
+    		]);
 
         if (technicianAppointments.length === 0) {
             return res

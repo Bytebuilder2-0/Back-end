@@ -50,6 +50,7 @@ const registerUser = async (req, res) => {
   }
 };
 const getUserById = async (req, res) => {
+  console.log("Fetching user by ID:", req.params.user_id);
   try {
     const user = await User.findById(req.params.user_id).select("-password"); // Exclude password
     if (!user) {
@@ -63,4 +64,62 @@ const getUserById = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, getUserById };
+const updateUserProfile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { email, userName, phone, password } = req.body;
+    const profilePhoto = req.file?.path;
+
+    const updateData = {};
+
+    if (email) updateData.email = email;
+    if (userName) updateData.name = userName;
+    if (phone) updateData.phone = phone;
+    if (profilePhoto) updateData.profilePhoto = profilePhoto;
+    if (password) {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      updateData.password = hashedPassword;
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(userId, { $set: updateData }, { new: true });
+    if (!updatedUser) return res.status(404).json({ message: 'User not found' });
+
+    res.json({ message: 'Profile updated', user: updatedUser });
+  } catch (err) {
+    res.status(500).json({ message: 'Update failed', error: err.message });
+  }
+};
+const deleteUser = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    // Delete all vehicles linked to the user
+    await Vehicle.deleteMany({ user: userId });
+
+    // Delete the user
+    const deletedUser = await User.findByIdAndDelete(userId);
+
+    if (!deletedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({ message: "User and related data deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to delete user", error: error.message });
+  }
+};
+const getUserProfile = async (req, res) => {
+  console.log(req);
+  try {
+    const userId = req.user.id;
+    console.log("User ID from token:", userId);
+    const user = await User.findById(userId).select('-password');
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    res.json({ user }); // return user inside an object
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to fetch profile', error: err.message });
+  }
+};
+
+module.exports = { registerUser, getUserById, updateUserProfile, deleteUser, getUserProfile };
