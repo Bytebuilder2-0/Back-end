@@ -25,7 +25,7 @@ const {
 } = require("../controllers/vehicleController");
 const { assignTechnician } = require("../controllers/assignTechnician.js");
 const { updateAppointmentStatus } = require("../controllers/statusUpdate.js");
-const { tStatusUpdate } = require("../controllers/TStatusUpdate.js");
+const { tStatusUpdate } = require("../controllers/tStatusUpdate.js");
 const { tSuggestionWrite } = require("../controllers/tSuggestionWrite.js");
 const { getTechMessage } = require("../controllers/appointmentController.js");
 const { setReason } = require("../controllers/reasonSet.js");
