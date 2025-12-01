@@ -25,8 +25,32 @@ connectDB();
 const app = express();
 
 //Middlewares
+const allowedOrigins = [
+  process.env.FRONTEND_BASE_URL,
+  'http://localhost:5173',
+  'http://localhost:5174',
+  /https:\/\/.*\.vercel\.app$/  // Allow all Vercel preview URLs
+];
+
 const corsOptions = {
-  origin: process.env.FRONTEND_BASE_URL || '*',
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl)
+    if (!origin) return callback(null, true);
+    
+    // Check if origin is in allowed list or matches Vercel pattern
+    const isAllowed = allowedOrigins.some(allowed => {
+      if (allowed instanceof RegExp) {
+        return allowed.test(origin);
+      }
+      return allowed === origin;
+    });
+    
+    if (isAllowed) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   optionsSuccessStatus: 200
 };
