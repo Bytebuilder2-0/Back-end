@@ -57,11 +57,25 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
+// Request logging middleware
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.path}`);
+  next();
+});
+
 //Routes
 
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ status: 'ok', message: 'Server is running' });
+});
+
+// Public routes (no auth required)
 app.use("/api/feedbackDisplay", feedbackDisplayRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/payment", paymentRoutes);
+
+// Apply auth middleware to all routes below
 app.use(authMiddleware);
 
 app.use("/api/appointments", appointmentRoutes);
