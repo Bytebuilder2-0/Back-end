@@ -124,7 +124,8 @@ const createAppointment = async (req, res) => {
     await notifyAllManagers(
       `New appointment from ${user.name} for ${selectedVehicle.vehicleNumber} (${selectedVehicle.model})`,
       "new_appointment",
-      newAppointment._id
+      newAppointment._id,
+      req
     );
 
     res.status(201).json({

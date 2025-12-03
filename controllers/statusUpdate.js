@@ -21,7 +21,8 @@ const updateAppointmentStatus = async(req, res) => {
                 "customer",
                 `Your appointment for ${deletedAppointment.vehicleNumber} has been rejected by the manager`,
                 "appointment_rejected",
-                deletedAppointment._id
+                deletedAppointment._id,
+                req
             );
 
             return res.json({
@@ -70,7 +71,8 @@ const updateAppointmentStatus = async(req, res) => {
                 "customer",
                 notificationMessage,
                 notificationType,
-                appointment._id
+                appointment._id,
+                req
             );
         }
 

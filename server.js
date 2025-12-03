@@ -1,4 +1,6 @@
 const express = require("express");
+const http = require("http");
+const { Server } = require("socket.io");
 const dotenv = require("dotenv");
 const cors = require("cors");
 const bodyParser = require("body-parser");
@@ -24,6 +26,7 @@ dotenv.config();
 connectDB();
 
 const app = express();
+const server = http.createServer(app);
 
 //Middlewares
 const allowedOrigins = [
@@ -58,6 +61,36 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
+// Socket.IO setup
+const io = new Server(server, {
+  cors: corsOptions,
+});
+
+// Store connected users by userId
+const connectedUsers = new Map();
+
+io.on("connection", (socket) => {
+  console.log("Client connected:", socket.id);
+
+  // User joins with their userId
+  socket.on("join", (userId) => {
+    console.log(`User ${userId} joined with socket ${socket.id}`);
+    connectedUsers.set(userId, socket.id);
+    socket.userId = userId;
+  });
+
+  socket.on("disconnect", () => {
+    console.log("Client disconnected:", socket.id);
+    if (socket.userId) {
+      connectedUsers.delete(socket.userId);
+    }
+  });
+});
+
+// Make io available to routes
+app.set("io", io);
+app.set("connectedUsers", connectedUsers);
+
 // Request logging middleware
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.path}`);
@@ -89,4 +122,4 @@ app.use("/api/supervisor", supervisorRoutes);
 app.use("/api/notifications", notificationRoutes);
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(` Server running on port ${PORT}`));
+server.listen(PORT, () => console.log(` Server running on port ${PORT}`));
