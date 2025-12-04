@@ -22,7 +22,9 @@ const tStatusUpdate = async (req, res) => {
       let notificationType = "general";
 
       if (status === "Reject2") {
-        message = `Technician rejected appointment for vehicle ${appointment.vehicleNumber}. Reason: ${reason || "Not specified"}`;
+        message = `Technician rejected appointment for vehicle ${
+          appointment.vehicleNumber
+        }. Reason: ${reason || "Not specified"}`;
         notificationType = "appointment_rejected";
       } else if (status === "Accepted") {
         message = `Technician accepted appointment for vehicle ${appointment.vehicleNumber}`;
