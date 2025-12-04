@@ -27,7 +27,7 @@ const notificationSchema = new mongoose.Schema(
         "work_started",
         "work_completed",
         "payment_pending",
-        "general"
+        "general",
       ],
       default: "general",
     },

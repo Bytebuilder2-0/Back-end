@@ -3,7 +3,14 @@ const User = require("../models/User");
 const auth = require("../models/auth");
 
 // Helper function to create notification
-const createNotification = async (userId, role, message, type, appointmentId = null, req = null) => {
+const createNotification = async (
+  userId,
+  role,
+  message,
+  type,
+  appointmentId = null,
+  req = null
+) => {
   try {
     const notification = new Notification({
       userId,
@@ -13,24 +20,27 @@ const createNotification = async (userId, role, message, type, appointmentId = n
       appointmentId,
     });
     await notification.save();
-    
+
     // Emit real-time notification via Socket.IO if available
     if (req && req.app) {
       const io = req.app.get("io");
       const connectedUsers = req.app.get("connectedUsers");
-      
+
       if (io && connectedUsers) {
         const socketId = connectedUsers.get(userId.toString());
         if (socketId) {
           io.to(socketId).emit("newNotification", {
             notification,
-            unreadCount: await Notification.countDocuments({ userId, isRead: false })
+            unreadCount: await Notification.countDocuments({
+              userId,
+              isRead: false,
+            }),
           });
           console.log(`Real-time notification sent to user ${userId}`);
         }
       }
     }
-    
+
     return notification;
   } catch (error) {
     console.error("Error creating notification:", error);
@@ -131,10 +141,7 @@ const markAllAsRead = async (req, res) => {
   try {
     const { userId } = req.params;
 
-    await Notification.updateMany(
-      { userId, isRead: false },
-      { isRead: true }
-    );
+    await Notification.updateMany({ userId, isRead: false }, { isRead: true });
 
     res.status(200).json({
       success: true,
@@ -182,7 +189,7 @@ const deleteNotification = async (req, res) => {
 const notifyAllManagers = async (message, type, appointmentId, req = null) => {
   try {
     const managers = await auth.find({ role: "manager" });
-    
+
     const notifications = managers.map((manager) => ({
       userId: manager._id,
       role: "manager",
@@ -193,26 +200,26 @@ const notifyAllManagers = async (message, type, appointmentId, req = null) => {
 
     const savedNotifications = await Notification.insertMany(notifications);
     console.log(`Notified ${managers.length} managers`);
-    
+
     // Emit real-time notifications via Socket.IO
     if (req && req.app) {
       const io = req.app.get("io");
       const connectedUsers = req.app.get("connectedUsers");
-      
+
       if (io && connectedUsers) {
         for (let i = 0; i < managers.length; i++) {
           const managerId = managers[i]._id.toString();
           const socketId = connectedUsers.get(managerId);
-          
+
           if (socketId) {
-            const unreadCount = await Notification.countDocuments({ 
-              userId: managers[i]._id, 
-              isRead: false 
+            const unreadCount = await Notification.countDocuments({
+              userId: managers[i]._id,
+              isRead: false,
             });
-            
+
             io.to(socketId).emit("newNotification", {
               notification: savedNotifications[i],
-              unreadCount
+              unreadCount,
             });
             console.log(`Real-time notification sent to manager ${managerId}`);
           }
