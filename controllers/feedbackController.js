@@ -1,6 +1,9 @@
 const Feedback = require("../models/Feedback");
 const Appointment = require("../models/Appointment");
-const { notifyAllManagers, createNotification } = require("./notificationController");
+const {
+  notifyAllManagers,
+  createNotification,
+} = require("./notificationController");
 
 //  Fetch feedbacks (excluding deleted)  for manager
 const getFeedbacks = async (req, res) => {
@@ -158,15 +161,15 @@ const addReply = async (req, res) => {
     const { reply } = req.body;
 
     const feedback = await Feedback.findByIdAndUpdate(
-      id, 
+      id,
       { reply },
       { new: true }
     ).populate({
       path: "appointmentId",
       populate: {
         path: "userId",
-        select: "_id"
-      }
+        select: "_id",
+      },
     });
 
     if (!feedback) {
@@ -178,7 +181,9 @@ const addReply = async (req, res) => {
       await createNotification(
         feedback.appointmentId.userId._id,
         "customer",
-        `Manager replied to your feedback: "${reply.substring(0, 50)}${reply.length > 50 ? '...' : ''}"`,
+        `Manager replied to your feedback: "${reply.substring(0, 50)}${
+          reply.length > 50 ? "..." : ""
+        }"`,
         "general",
         feedback.appointmentId._id,
         req
