@@ -3,7 +3,7 @@ const Appointment = require("../models/Appointment");
 // Update the status (and optionally reason) of the appointment
 const tSuggestionWrite = async (req, res) => {
   try {
-    const {techMessage } = req.body;
+    const { techMessage } = req.body;
 
     const appointment = await Appointment.findByIdAndUpdate(
       req.params.appointmentId,

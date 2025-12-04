@@ -1,5 +1,6 @@
 const Feedback = require("../models/Feedback");
 const Appointment = require("../models/Appointment");
+const { notifyAllManagers } = require("./notificationController");
 
 //  Fetch feedbacks (excluding deleted)  for manager
 const getFeedbacks = async (req, res) => {
@@ -85,6 +86,14 @@ const submitFeedback = async (req, res) => {
     appointment.feedbackId = feedback._id;
     appointment.feedbackStatus = true;
     await appointment.save();
+
+    // Notify all managers about new feedback
+    await notifyAllManagers(
+      `New feedback submitted for appointment ${appointment.vehicleNumber} with ${rating} stars`,
+      "general",
+      appointment._id,
+      req
+    );
 
     return res.status(201).json({
       success: true,

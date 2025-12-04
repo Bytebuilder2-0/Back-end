@@ -231,6 +231,59 @@ const notifyAllManagers = async (message, type, appointmentId, req = null) => {
   }
 };
 
+// Notify all supervisors
+const notifyAllSupervisors = async (
+  message,
+  type,
+  appointmentId,
+  req = null
+) => {
+  try {
+    const supervisors = await auth.find({ role: "supervisor" });
+
+    const notifications = supervisors.map((supervisor) => ({
+      userId: supervisor._id,
+      role: "supervisor",
+      message,
+      type,
+      appointmentId,
+    }));
+
+    const savedNotifications = await Notification.insertMany(notifications);
+    console.log(`Notified ${supervisors.length} supervisors`);
+
+    // Emit real-time notifications via Socket.IO
+    if (req && req.app) {
+      const io = req.app.get("io");
+      const connectedUsers = req.app.get("connectedUsers");
+
+      if (io && connectedUsers) {
+        for (let i = 0; i < supervisors.length; i++) {
+          const supervisorId = supervisors[i]._id.toString();
+          const socketId = connectedUsers.get(supervisorId);
+
+          if (socketId) {
+            const unreadCount = await Notification.countDocuments({
+              userId: supervisors[i]._id,
+              isRead: false,
+            });
+
+            io.to(socketId).emit("newNotification", {
+              notification: savedNotifications[i],
+              unreadCount,
+            });
+            console.log(
+              `Real-time notification sent to supervisor ${supervisorId}`
+            );
+          }
+        }
+      }
+    }
+  } catch (error) {
+    console.error("Error notifying supervisors:", error);
+  }
+};
+
 module.exports = {
   createNotification,
   getUserNotifications,
@@ -239,4 +292,5 @@ module.exports = {
   markAllAsRead,
   deleteNotification,
   notifyAllManagers,
+  notifyAllSupervisors,
 };
