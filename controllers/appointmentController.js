@@ -6,6 +6,7 @@ const Vehicle = require("../models/Vehicle");
 const Service = require("../models/Service");
 const Budget = require("../models/Budget.js");
 const Feedback = require("../models/Feedback");
+const { notifyAllManagers } = require("./notificationController");
 
 // 1️ Create a new appointment (Client submits form)
 const createAppointment = async (req, res) => {
@@ -117,6 +118,15 @@ const createAppointment = async (req, res) => {
     // Step 3: (Optional) Link the budget in the appointment model if needed
     newAppointment.budgetId = newBudget._id;
     await newAppointment.save();
+
+    // Notify all managers about the new appointment
+    const user = await User.findById(userId);
+    await notifyAllManagers(
+      `New appointment from ${user.name} for ${selectedVehicle.vehicleNumber} (${selectedVehicle.model})`,
+      "new_appointment",
+      newAppointment._id,
+      req
+    );
 
     res.status(201).json({
       message: "Appointment,Budget and FeedBack created successfully",
